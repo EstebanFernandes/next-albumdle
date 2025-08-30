@@ -4,6 +4,7 @@ import Papa from 'papaparse';
 import { Album } from "../types/albums";
 import { getRandomElements } from "./utils";
 import { createDefaultStat } from "../types/stat";
+import { RawAlbumRow } from "../types/csv.types";
 
 // Global cache to avoid reparsing the CSV each time
 let cachedAlbums: Album[]  = [];
@@ -13,10 +14,10 @@ export function getAlbums(numberOfAlbums?: number): Album[] {
     hasBeenCalled = true;
     const csvPath = path.join(process.cwd(), "data", "albums.csv");
     const csvFile = fs.readFileSync(csvPath, "utf8");
-    const result = Papa.parse(csvFile, { header: true }).data;
+    const result = Papa.parse<RawAlbumRow>(csvFile, { header: true }).data;
     let i = 0;
      // Cast to Album[]
-    cachedAlbums = result.map((row: any) => ({
+    cachedAlbums = result.map((row: RawAlbumRow) => ({
       id: i++,          // convert string -> number
       title: row.album,
       rank: parseInt(row.rank_2020),
@@ -29,7 +30,7 @@ export function getAlbums(numberOfAlbums?: number): Album[] {
       genres: row.genres ? row.genres.split(";") : [],
       top_songs: row.top_songs ? row.top_songs.split(";") : [],
       artist: row.clean_name || undefined,
-      releaseDate: row.release_year || undefined,
+      releaseDate: parseInt(row.release_year) || undefined,
       color : createDefaultStat()
     })) as Album[];
   console.log(`Cached ${cachedAlbums.length} albums `);

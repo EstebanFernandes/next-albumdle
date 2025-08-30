@@ -33,9 +33,7 @@ export interface GameClientLastUpdate {
 }
 
 
-function isClientUpdate(object: any): object is GameClientUpdate {
-    return 'attemptVerify' in object;
-}
+
 
 export function createFirstGameState( secure_ :{ data: string; signature: string }) : GameClientFirstInformation{
 return {

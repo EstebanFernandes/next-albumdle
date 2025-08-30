@@ -5,6 +5,7 @@ import { Header } from "@/src/components/header";
 import { Background } from "@/src/components/background";
 import { getAlbums } from "@/src/lib/csv";
 
+/*
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -15,7 +16,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-
+*/
 const josefin_Sans = Josefin_Sans({
   variable: "--font-josefin-sans",
   subsets: ["latin"],

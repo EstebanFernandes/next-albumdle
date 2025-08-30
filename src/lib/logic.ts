@@ -1,11 +1,7 @@
 "use server";
 // This file should contain game's logic, as choosing the right album based on user input. and decide the album of the day
-import Image from "next/image";
-import { CircleQuestionMark } from "lucide-react";
-import { Carousel, CarouselContent, CarouselNext, CarouselItem } from "../components/ui/carousel";
-import AutoScroll from 'embla-carousel-auto-scroll'
-import { Album, createStat } from "../types/albums";
-import { Card, CardContent } from "../components/ui/card";
+import { Album } from "../types/albums";
+
 import { getAlbums } from "./csv";
 import { isSameDayAsToday } from "./utils";
 import { createDefaultMainStat, createDefaultStat, Stat } from "../types/stat";
@@ -16,7 +12,7 @@ import { createDefaultGameState, createFirstGameState, GameClientFirstInformatio
 //This function will handle games logic, it will be store in the main page
 let album :Album | null = null;
 const albums = getAlbums();
-let lastDate = new Date();
+const lastDate = new Date();
 
 const correct:string ="bg-[#61B35B]"
 const incorrect:string ="bg-[#D83B3B]"
@@ -81,7 +77,7 @@ if(album===null|| state.isGameOver)
   // --- Validate the guess ---
 console.log(albums[guessId].artist)
 const albumOfTheDay = album;
-let guess = albums[guessId]
+const guess = albums[guessId]
   const isCorrect = guessId === albumOfTheDay.id;
 
   updateState(state,guess);
@@ -174,7 +170,7 @@ function numericLogic(values :number[], aimValue : number, isReverse = false) {
   let closest = values[0];
   let minDiff = Math.abs(values[0] - aimValue);
 
-  for (let val of values) {
+  for (const val of values) {
     const diff = Math.abs(val - aimValue);
     if (diff < minDiff) {
       minDiff = diff;
@@ -195,7 +191,7 @@ function genreLogic(genres :string[], aimGenres:string[]) : string {
   }
 
   const genresSet = new Set(genres.map(g => g.toLowerCase()));
-  let returns:string[] = []
+  const returns:string[] = []
   for(let i = 0; i < aimGenres.length; i++) {
     const g = aimGenres[i];
     if (genresSet.has(g.toLowerCase())) {
@@ -204,7 +200,6 @@ function genreLogic(genres :string[], aimGenres:string[]) : string {
     else
       returns.push("?");
   }
-  const notFound="?"
 
   return returns.join('/');
 }
@@ -230,21 +225,7 @@ function memberLogic(members:number[], aimMember: number):string {
 
 
 
-function locationLogic(locations:string[], aimLocation: string) : string {
-  if (!Array.isArray(locations) || locations.length === 0 || !aimLocation) {
-    return '?';
-  
-  }
 
-  const found = locations.find(location => location.toLowerCase() === aimLocation.toLowerCase());
-
-  if (found) {
-   return aimLocation;
-  }
-  else {
-    return '?';
-    }
-}
 
 
 function capitalize(stringToCapitalize:string) {
@@ -272,7 +253,7 @@ function verifyState(data: string, signature: string) {
 }
 
 function calculateNewStat(state: GameState): Stat {
-    let returnStat = createDefaultMainStat()
+    const returnStat = createDefaultMainStat()
     if(album===null)
         return returnStat
   //ARTIST NAME LOGIC
@@ -333,8 +314,8 @@ function updateColorOfAlbum(albumToTry: Album) {
         albumToTry.color.genres = (albumToTry.genres.join("/") === album?.genres.join("/")) ? correct : incorrect;
         
         let found=0;
-        let albumGenres = album?.genres|| [];
-        for(let genre of albumGenres)
+        const albumGenres = album?.genres|| [];
+        for(const genre of albumGenres)
         {
             if(albumToTry.genres.includes(genre))
                 found++;
@@ -344,7 +325,7 @@ function updateColorOfAlbum(albumToTry: Album) {
 
         albumToTry.color.type = (albumToTry.type === album?.type) ? correct : incorrect;
 
-        let tryCount = albumToTry.memberCount; let albumCount = album?.memberCount || 0;
+        const tryCount = albumToTry.memberCount; const albumCount = album?.memberCount || 0;
         if(tryCount===albumCount)
             albumToTry.color.memberCount = correct;
         else if (Math.abs(tryCount-albumCount)===1) //Little difference

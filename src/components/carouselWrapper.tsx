@@ -1,7 +1,6 @@
 "use client"; 
 import Image from "next/image";
-import { CircleQuestionMark } from "lucide-react";
-import { Carousel, CarouselContent, CarouselNext, CarouselItem } from "./ui/carousel";
+import { Carousel, CarouselContent, CarouselItem } from "./ui/carousel";
 import AutoScroll from 'embla-carousel-auto-scroll'
 import { Album } from "../types/albums";
 import React from "react";

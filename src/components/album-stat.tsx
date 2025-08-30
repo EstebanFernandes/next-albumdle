@@ -1,11 +1,8 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
-import { Card } from "./ui/card"
-import { Input } from "./ui/input"
 import { Album } from "../types/albums"
 import { Calendar, Disc, MapPinned, Medal, MicVocal, Music, Users } from "lucide-react"
-import { Stat } from "../types/stat"
+
 
 export default function StatDisplay({
   album

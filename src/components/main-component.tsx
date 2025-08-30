@@ -111,7 +111,7 @@ function displayLastDialog(ClientLastUpdate: GameClientLastUpdate | null)
 {
   if( !ClientLastUpdate) return;
 const hasWin = ClientLastUpdate.hasWin;
-let album = ClientLastUpdate.answer;
+const album = ClientLastUpdate.answer;
   const title = hasWin ? "Congratulations !" : "Game Over";
   const message = hasWin ? `You guessed  it right !` : `Loser`;
   album.color = createDefaultStat()
@@ -133,8 +133,8 @@ let album = ClientLastUpdate.answer;
 	return (
 		<div className=" lg:w-[50vw] sm:w-[90vw] h-full">
             <div className="flex flex-col justify-center items-center gap-2 mt-5">
-                <div className="text-3xl">Guess today's album ! </div>
-                <div className="text-xl"> To play, simply enter an album title in the field below and click "Guess".</div>
+                <div className="text-3xl">Guess todays&apos;album ! </div>
+                <div className="text-xl"> To play, simply enter an album title in the field below and click &quot;Guess&quot;.</div>
             </div>
             <div className="flex flex-col justify-center items-center gap-4 mt-6">
              <AutoComplete fullList={fullAutoCompleteList} onEnter={handleEnter}/>
@@ -149,7 +149,7 @@ let album = ClientLastUpdate.answer;
                        ></div>
                      ))}
                 </div>
-                 Attempts lefts : {gameState?.maxAttempts! - gameState?.attempts.length!}
+                 Attempts lefts : { gameState && gameState.maxAttempts! - gameState.attempts.length!}
                 </div>
              <div className={`flex flex-col justify-center items-center gap-4 w-full
               ${beginTransition}`}>
