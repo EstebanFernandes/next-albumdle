@@ -87,7 +87,6 @@ function updateGame(gameUpdate: GameClientUpdate| GameClientFirstInformation | G
           setClientLastUpdate(gameUpdate);
           break;
         }
-        attemptListRef.current?.scroll({top:0,behavior:"smooth"});
         
         
 }
@@ -116,17 +115,25 @@ const album = ClientLastUpdate.answer;
   const message = hasWin ? `You guessed  it right !` : `Loser`;
   album.color = createDefaultStat()
   return (
-    <Dialog open={true}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-        </DialogHeader>
-        {message}
-        <AlbumDisplay album={album} />
-      </DialogContent>
-    </Dialog>
+   <div>
+          <p>{title}</p>
+        <p>{message}</p>
+        The album was <AlbumDisplay album={album} />
+        Come tomorrow for the next guess !
+</div>
   );
 }
+
+function displayCurrentInformation(knownStat: Stat)
+{
+  return (
+   <div>
+    <p className={`text-2xl  ${beginTransition}`}>Current information</p>
+         <StatMainDisplay  stat={knownStat}/>
+</div>
+  );
+}
+
 
 
   
@@ -153,15 +160,15 @@ const album = ClientLastUpdate.answer;
                 </div>
              <div className={`flex flex-col justify-center items-center gap-4 w-full
               ${beginTransition}`}>
-             <p className={`text-2xl  ${beginTransition}`}>Current information</p>
-             <StatMainDisplay  stat={displayInfo}/>
+             {clientLastUpdate===null && displayCurrentInformation(displayInfo)}
+             {clientLastUpdate && displayLastDialog(clientLastUpdate)}
              <Separator className={`  ${beginTransition}`}></Separator>
              <p className="text-2xl"> Attempts list</p>
-        <div ref={attemptListRef} className="flex flex-col-reverse gap-4 w-full h-[30vh] overflow-auto">
+        <div className="flex flex-col-reverse gap-4 w-full">
         {gameState?.attempts.map((album, index) => (
     <AlbumDisplay key={album.id} album={album} />
 ))}
-{displayLastDialog(clientLastUpdate)}
+
         </div>
       </div>
       </div>

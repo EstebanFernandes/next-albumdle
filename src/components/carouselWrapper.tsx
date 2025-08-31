@@ -20,7 +20,6 @@ export function CarouselWrapper({ albums, carouselDirection }: CarouselWrapperPr
         loop: true,
         watchDrag: false,
         axis: "y",
-        containScroll: "keepSnaps"
     }}
     orientation="vertical"
     plugins={[
@@ -29,9 +28,6 @@ export function CarouselWrapper({ albums, carouselDirection }: CarouselWrapperPr
             speed: 0.5,                    // Adjust speed as needed (slower = smoother)
             playOnInit: true,
             stopOnInteraction: false,
-            startDelay: 0,                 // Start immediately
-            active: true,                  // Ensure it's always active
-            
         }),
     ]}
     className="w-[120px] overflow-hidden"

@@ -13,7 +13,7 @@ export function Background({ albums }: { albums: Album[] }) {
 
 	
 	return (
-		<div className="absolute pl-15 pr-15 top-0 left-0 w-full h-screen -z-100 flex flex-row justify-between blur-[2px]">
+		<div className="fixed pl-15 pr-15 top-0 left-0 w-full h-screen -z-100 flex flex-row justify-between blur-[2px]">
 			<div className="flex flex-row gap-5">
 			<CarouselWrapper albums={leftSide1} carouselDirection="forward"></CarouselWrapper>
 			<CarouselWrapper albums={rightSide1} carouselDirection="backward"></CarouselWrapper>

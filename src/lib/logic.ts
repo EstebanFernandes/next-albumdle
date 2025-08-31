@@ -61,7 +61,7 @@ export async function submitGuess(
   const state: GameState = JSON.parse(secure.data);
   if(album===null)
     updateTodayAlbum()
-if(album===null|| state.isGameOver)
+if(album===null)
   {
     const lastState : GameClientLastUpdate = {
       type: 'last',
@@ -77,42 +77,48 @@ if(album===null|| state.isGameOver)
   // --- Validate the guess ---
 console.log(albums[guessId].artist)
 const albumOfTheDay = album;
-const guess = albums[guessId]
-  const isCorrect = guessId === albumOfTheDay.id;
+if(state.isGameOver)
+{
+  
+}
+const guess = albums[guessId];  
+
 
   updateState(state,guess);
-console.log(isCorrect);
-  // Return updated state
-  const signed = signState(state);
-  if(isCorrect===false)
+const isCorrect = state.attempts.some(a => a.id === albumOfTheDay.id);
+
+if(state.isGameOver || isCorrect)
   {
-    const clientInfo : GameClientUpdate = {
-    type: 'update',
-    attemptVerify :guess,
-    knownStat: calculateNewStat(state),
-    secure: signed,
-    isGameOver : state.isGameOver
-  }
-  return clientInfo;
-  }
-  else{
-    const clientLastInfo : GameClientLastUpdate = {
+    const lastState : GameClientLastUpdate = {
       type: 'last',
-      hasWin: true,
-      answer: album,
+      hasWin: isCorrect,
+      answer: albumOfTheDay,
       secure: signState(state),
       knownStat: calculateNewStat(state),
       isGameOver: true
     };
-    return clientLastInfo;
-  }
+    return lastState;
+   }
+
+
+    const clientInfo : GameClientUpdate = {
+    type: 'update',
+    attemptVerify :guess,
+    knownStat: calculateNewStat(state),
+    secure: signState(state),
+    isGameOver : state.isGameOver
+  };
+
+  return clientInfo;
 }
 
 function updateState(state: GameState, guess: Album) {
   // Update the game state as needed
   state.attempts.push(guess);
-    if (guess.id === album?.id || state.attempts.length >= state.maxAttempts) {
+  console.log(state.attempts.length, state.maxAttempts)
+    if (state.attempts.length >= state.maxAttempts) {
         state.isGameOver = true;  
+        console.log("Game over here")
     }
     updateColorOfAlbum(guess);
 }
@@ -222,11 +228,6 @@ function memberLogic(members:number[], aimMember: number):string {
   else
     return `Group (${aimMember})`;
   }
-
-
-
-
-
 
 function capitalize(stringToCapitalize:string) {
   return stringToCapitalize.charAt(0).toUpperCase() + stringToCapitalize.slice(1);
