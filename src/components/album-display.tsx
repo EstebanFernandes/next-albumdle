@@ -21,7 +21,7 @@ export function AlbumDisplay({ album }: { album: Album }) {
 				className="rounded-md  aspect-square" />
 				<div className="ml-4 flex flex-col justify-center">
 					<p className="font-semibold">{album.title}</p>
-					<p className="italic text-gray-800">{album.artist}</p>
+					<p className="italic text-muted-foreground">{album.artist}</p>
 				</div>
 				<StatDisplay album={album}></StatDisplay>
 
