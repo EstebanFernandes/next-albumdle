@@ -8,10 +8,11 @@ import React from "react";
 type CarouselWrapperProps = {
 	albums: Album[]
 	carouselDirection: "forward" | "backward"
+	className?: string
 }
 
 //The background will randomly load 40 albums and make 2 carousels that display 20 albums each
-export function CarouselWrapper({ albums, carouselDirection }: CarouselWrapperProps) {
+export function CarouselWrapper({ albums, carouselDirection,className="" }: CarouselWrapperProps) {
 
 	return (
    <Carousel
@@ -30,7 +31,7 @@ export function CarouselWrapper({ albums, carouselDirection }: CarouselWrapperPr
             stopOnInteraction: false,
         }),
     ]}
-    className="w-[120px] overflow-hidden"
+    className={`w-[50px] xs:w-[70px] sm:w-[70px] lg:w-[120px] overflow-hidden ${className}`}
 >
 	<CarouselContent >
 		{albums.map((album) => (

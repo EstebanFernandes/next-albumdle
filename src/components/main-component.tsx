@@ -138,7 +138,7 @@ function displayCurrentInformation(knownStat: Stat)
 
   
 	return (
-		<div className=" lg:w-[50vw] sm:w-[90vw] h-full">
+		<div className=" w-[70vw] lg:w-[50vw] md:w-[50vw]  h-full">
             <div className="flex flex-col justify-center items-center gap-2 mt-5">
                 <div className="text-3xl">Guess todays&apos;album ! </div>
                 <div className="text-xl"> To play, simply enter an album title in the field below and click &quot;Guess&quot;.</div>

@@ -39,7 +39,7 @@ export default function RootLayout({
         className={`${josefin_Sans.className} antialiased flex flex-col justify-center items-center w-full h-full`}
       >
         <Header />
-        <Background albums={getAlbums(40)}/>
+        <Background albums={getAlbums(40)} />
         {children}
       </body>
     </html>

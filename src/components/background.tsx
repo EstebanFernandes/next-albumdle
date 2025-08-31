@@ -13,13 +13,14 @@ export function Background({ albums }: { albums: Album[] }) {
 
 	
 	return (
-		<div className="fixed pl-15 pr-15 top-0 left-0 w-full h-screen -z-100 flex flex-row justify-between blur-[2px]">
-			<div className="flex flex-row gap-5">
-			<CarouselWrapper albums={leftSide1} carouselDirection="forward"></CarouselWrapper>
+		<div className="fixed lg:px-14 md:px-10 sm:px-5 px-1 top-0 left-0 w-full h-screen -z-100 flex flex-row justify-around gap-6">
+			<div className="flex flex-row gap-1 lg:gap-5">
+			<CarouselWrapper albums={leftSide1} className="hidden  xl:inline "  carouselDirection="forward"></CarouselWrapper>
 			<CarouselWrapper albums={rightSide1} carouselDirection="backward"></CarouselWrapper>
 			</div>
+			<div className="  w-[70vw] lg:w-[50vw] md:w-[50vw] "></div>
 			<div className="flex flex-row gap-5">
-			<CarouselWrapper albums={leftSide2} carouselDirection="forward"></CarouselWrapper>
+			<CarouselWrapper albums={leftSide2} className="hidden  xl:inline " carouselDirection="forward"></CarouselWrapper>
 			<CarouselWrapper albums={rightSide2} carouselDirection="backward"></CarouselWrapper>
 			</div>
 		</div>

@@ -4,8 +4,8 @@ export function Header() {
   return (
     <header 
     className="
-    sticky top-0 p-4 bg-white text-gray-800 border-b border-gray-300 z-100
-    flex flex-row justify-center items-center gap-5 w-full
+    sticky top-0 w-full py-4 bg-white text-gray-800 border-b border-gray-300 z-100
+    flex flex-row justify-center items-center gap-5 
     ">
       <Image src="/logo.png" alt="Albumdle Logo" 
       width={56} height={56}
