@@ -315,7 +315,7 @@ function updateColorOfAlbum(albumToTry: Album) {
         //Here we gonna compare each genre
         
         
-        let found=0;
+        const found=0;
         const albumGenres = album?.genres|| [];
         albumToTry.color.genres = []
         for(const genre of albumToTry.genres)
