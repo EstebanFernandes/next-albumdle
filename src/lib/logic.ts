@@ -191,9 +191,9 @@ function numericLogic(values :number[], aimValue : number, isReverse = false) {
   return `${closest} ${direction}`;
 }
 
-function genreLogic(genres :string[], aimGenres:string[]) : string {
+function genreLogic(genres :string[], aimGenres:string[]) : string[] {
   if (!Array.isArray(genres) || genres.length === 0 || !aimGenres) {
-    return '?';
+    return ['?'];
   }
 
   const genresSet = new Set(genres.map(g => g.toLowerCase()));
@@ -207,7 +207,7 @@ function genreLogic(genres :string[], aimGenres:string[]) : string {
       returns.push("?");
   }
 
-  return returns.join('/');
+  return returns;
 }
 
 
@@ -312,18 +312,21 @@ function updateColorOfAlbum(albumToTry: Album) {
 
         albumToTry.color.date = (albumToTry.releaseDate === album?.releaseDate) ? correct : incorrect;
         
-        albumToTry.color.genres = (albumToTry.genres.join("/") === album?.genres.join("/")) ? correct : incorrect;
+        //Here we gonna compare each genre
+        
         
         let found=0;
         const albumGenres = album?.genres|| [];
-        for(const genre of albumGenres)
+        albumToTry.color.genres = []
+        for(const genre of albumToTry.genres)
         {
-            if(albumToTry.genres.includes(genre))
-                found++;
+            if(albumGenres.includes(genre))
+              albumToTry.color.genres.push(correct);
+            else
+              albumToTry.color.genres.push(incorrect);
         }
 
-        albumToTry.color.genres = (found===album?.genres.length) ? correct : (found>0) ? partial : incorrect;
-
+        
         albumToTry.color.type = (albumToTry.type === album?.type) ? correct : incorrect;
 
         const tryCount = albumToTry.memberCount; const albumCount = album?.memberCount || 0;

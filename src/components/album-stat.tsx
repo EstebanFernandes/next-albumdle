@@ -1,7 +1,8 @@
 "use client"
 
 import { Album } from "../types/albums"
-import { Calendar, Disc, MapPinned, Medal, MicVocal, Music, Users } from "lucide-react"
+import {  Calendar, Disc, MapPinned, Medal, MicVocal, Music, Users } from "lucide-react"
+import { Badge } from "./ui/badge"
 
 
 export default function StatDisplay({
@@ -20,9 +21,11 @@ export default function StatDisplay({
           <Calendar />
           {album.releaseDate}
         </div>
-        <div className={`flex items-center rounded-md gap-2 ${album.color.genres}`}>
+        <div className={`flex items-center rounded-md gap-2 `}>
           <Music />
-          {album.genres.join("/")}
+          {album.genres.map((genre,index)=>{
+            return <Badge key={genre} className={`${album.color.genres[index]}`} variant="default">{genre}</Badge>
+          })}
         </div>
         <div className={`flex items-center rounded-md gap-2 ${album.color.type}`}>
           <MicVocal />

@@ -16,9 +16,8 @@ export function AlbumDisplay({ album }: { album: Album }) {
 		<div className={`flex flex-row items-start
 			transition-opacity duration-700 ${
         mounted ? "opacity-100" : "opacity-0"}`}>
-
 			<Image src={album.large_thumbnail} alt={album.title} width={128} height={128}
-				className="rounded-md  aspect-square" />
+				className="size-[50px] sm:size-[80px] md:size-[100px] lg:size-[128px] rounded-md  aspect-square" />
 				<div className="ml-4 flex flex-col justify-center">
 					<p className="font-semibold">{album.title}</p>
 					<p className="italic text-muted-foreground">{album.artist}</p>

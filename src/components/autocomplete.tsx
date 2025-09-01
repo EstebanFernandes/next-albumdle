@@ -79,33 +79,35 @@ export default function AutoComplete({
   }
 
   return (
-    <div className="relative w-[500px]">
+    <div className="relative w-[250px] sm:w-[300px] md:w-[400px] lg:w-[500px]">
       <div className="w-full h-full flex flex-col justify-center items-center gap-2">
-      <Input
-        ref={inputRef}
-        placeholder="Search an album..."
-        value={inputValue}
-        onChange={(e) => handleChanges(e.target.value)}
-        onKeyDown={handleKeyDown}
-      />
+        <div className="w-full h-full flex flex-col justify-center items-center ">
+        <Input
+          ref={inputRef}
+          placeholder="Search an album or an artist"
+          value={inputValue}
+          onChange={(e) => handleChanges(e.target.value)}
+          onKeyDown={handleKeyDown}
+        />
+        {open && (
+          <Card className="absolute top-full -mt-2 w-full  rounded-lg border shadow-md z-50 py-0" >
+            <ul className="max-h-60 overflow-auto p-2">
+              {filteredList.map((item, index) => (
+                <li
+                  key={item.value}
+                  className={`cursor-pointer p-1 rounded-md ${
+                    index === activeIndex ? "bg-gray-100 dark:bg-gray-800" : ""
+                  }`}
+                  onMouseDown={() => selectItem(item)}
+                >
+                  <b>{item.labelImportant}</b> - <span className="text-gray-500">{item.labelSecondary}</span>
+                </li>
+              ))}
+            </ul>
+          </Card>
+        )}
+        </div>
       <Button onClick={enterPressed}>Guess</Button></div>
-      {open && (
-        <Card className="absolute top-full mt-2 w-full  rounded-lg border shadow-md z-50">
-          <ul className="max-h-60 overflow-auto p-2">
-            {filteredList.map((item, index) => (
-              <li
-                key={item.value}
-                className={`cursor-pointer p-1 rounded-md ${
-                  index === activeIndex ? "bg-gray-100 dark:bg-gray-800" : ""
-                }`}
-                onMouseDown={() => selectItem(item)}
-              >
-                <b>{item.labelImportant}</b> - <span className="text-gray-500">{item.labelSecondary}</span>
-              </li>
-            ))}
-          </ul>
-        </Card>
-      )}
     </div>
   )
 }

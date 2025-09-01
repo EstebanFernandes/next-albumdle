@@ -128,7 +128,7 @@ function displayCurrentInformation(knownStat: Stat)
 {
   return (
    <div>
-    <p className={`text-2xl  ${beginTransition}`}>Current information</p>
+    <p className={` ${beginTransition}`}>Current information</p>
          <StatMainDisplay  stat={knownStat}/>
 </div>
   );
@@ -138,10 +138,10 @@ function displayCurrentInformation(knownStat: Stat)
 
   
 	return (
-		<div className=" w-[70vw] lg:w-[50vw] md:w-[50vw]  h-full">
+		<div className=" w-[70vw] lg:w-[50vw] md:w-[50vw]  h-full text-xs sm:text-sm md:text-lg">
             <div className="flex flex-col justify-center items-center gap-2 mt-5">
-                <div className="text-3xl">Guess todays&apos;album ! </div>
-                <div className="text-xl"> To play, simply enter an album title in the field below and click &quot;Guess&quot;.</div>
+                <div className=" text-xl sm:text-2xl md:text-3xl">Guess todays&apos;album ! </div>
+                <div className="text-md sm:text-lg md:text-xl"> To play, simply enter an album title in the field below and click &quot;Guess&quot;.</div>
             </div>
             <div className="flex flex-col justify-center items-center gap-4 mt-6">
              <AutoComplete fullList={fullAutoCompleteList} onEnter={handleEnter}/>
@@ -164,7 +164,7 @@ function displayCurrentInformation(knownStat: Stat)
              {clientLastUpdate && displayLastDialog(clientLastUpdate)}
              <Separator className={`  ${beginTransition}`}></Separator>
              <p className="text-2xl"> Attempts list</p>
-        <div className="flex flex-col-reverse gap-4 w-full">
+        <div className="flex flex-col-reverse gap-4 w-full mb-4">
         {gameState?.attempts.map((album, index) => (
     <AlbumDisplay key={album.id} album={album} />
 ))}

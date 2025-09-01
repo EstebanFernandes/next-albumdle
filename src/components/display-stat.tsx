@@ -1,12 +1,9 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
-import { Card } from "./ui/card"
-import { Input } from "./ui/input"
-import { Album } from "../types/albums"
-import { ArrowBigDown, ArrowBigUp, ArrowDown, ArrowUp, Calendar, Disc, MapPinned, Medal, MicVocal, Music, Users } from "lucide-react"
+import { ArrowDown, ArrowUp, Calendar, Disc, MapPinned, Medal, MicVocal, Music, Users } from "lucide-react"
 import { Stat } from "../types/stat"
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip"
+import { Badge } from "./ui/badge"
 
 export default function StatMainDisplay({
 	stat
@@ -64,7 +61,11 @@ export default function StatMainDisplay({
 				<Tooltip>
           <TooltipTrigger className={`flex items-center gap-2 `}>
             <Music />
-          {numericStat(stat.genres)}</TooltipTrigger>
+            {stat.genres.map((genre,index)=>{
+                        return <Badge key={genre}  variant="default">{genre}</Badge>
+                      })}
+          
+          </TooltipTrigger>
           <TooltipContent>
             <p>Genres of the album</p>
           </TooltipContent>

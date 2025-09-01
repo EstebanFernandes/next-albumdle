@@ -2,7 +2,7 @@ export interface Stat {
 	artist:string;
 	rank: string;
 	date: string;
-	genres: string;
+	genres: string[];
 	type: string;
 	memberCount: string;
 	location: string;
@@ -17,7 +17,7 @@ export function createDefaultStat(): Stat {
         artist:"",
 		rank: '',
 		date: '',
-		genres: '',
+		genres: [],
 		type: '',
 		memberCount: '',
 		location: '',
@@ -31,7 +31,7 @@ export function createDefaultMainStat(): Stat {
 		artist: '?',
 		rank: '?',
 		date: '?',
-		genres: '?',
+		genres: ['?'],
 		type: '?',
 		memberCount: '?',
 		location: '?',

@@ -19,25 +19,25 @@ export function CarouselWrapper({ albums, carouselDirection,className="" }: Caro
     opts={{
         align: "start",
         loop: true,
-        watchDrag: false,
-        axis: "y",
+  
+  
     }}
     orientation="vertical"
-    plugins={[
+    plugins={[/*
         AutoScroll({
             direction: carouselDirection,  // Use direction instead of speed
             speed: 0.5,                    // Adjust speed as needed (slower = smoother)
             playOnInit: true,
             stopOnInteraction: false,
         }),
-    ]}
-    className={`w-[50px] xs:w-[70px] sm:w-[70px] lg:w-[120px] overflow-hidden ${className}`}
+    */]}
+    className={`w-[35px] sm:w-[70px] lg:w-[120px] h-full z-200 ${className}`}
 >
 	<CarouselContent >
 		{albums.map((album) => (
-			<CarouselItem key={album.id} className="relative group lg:basis-1/5 sm:basis-1/3" >
+			<CarouselItem key={album.id} className="relative group  py-10 sm:py-5 md:py-4 lg:py-3" >
 				<Image src={album.small_thumbnail} alt={album.title} width={100} height={100}
-					className="rounded-md w-full h-full object-cover aspect-square" />
+					className="rounded-sm sm:rounded-md w-full h-full object-cover aspect-square" />
 			</CarouselItem>
 		))}
 	</CarouselContent>
