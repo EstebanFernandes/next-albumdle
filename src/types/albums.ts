@@ -24,7 +24,7 @@ export function createStat(album: Album): Stat
                 artist: album.artist,
                 rank: album.rank.toString(),
                 date: album.releaseDate.toString(),
-                genres: album.genres.join(("/")),
+                genres: album.genres,
                 type: album.type,
                 memberCount: album.memberCount.toString(),
                 location: album.country,
