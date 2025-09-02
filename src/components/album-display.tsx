@@ -14,6 +14,8 @@ export function AlbumDisplay({ album }: { album: Album }) {
 	}, []);
 	return (
 		<div className={`flex flex-row items-start
+
+			h-[50px] sm:h-[80px] md:h-[100px] lg:h-[128px] gap-2
 			transition-opacity duration-700 ${
         mounted ? "opacity-100" : "opacity-0"}`}>
 			<Image src={album.large_thumbnail} alt={album.title} width={128} height={128}
@@ -22,7 +24,7 @@ export function AlbumDisplay({ album }: { album: Album }) {
 					<p className="font-semibold">{album.title}</p>
 					<p className="italic text-muted-foreground">{album.artist}</p>
 				</div>
-				<StatDisplay album={album}></StatDisplay>
+				<StatDisplay album={album} className="w-6/10"></StatDisplay>
 
 		</div>
 	);

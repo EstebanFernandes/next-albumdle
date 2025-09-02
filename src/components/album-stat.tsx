@@ -6,14 +6,13 @@ import { Badge } from "./ui/badge"
 
 
 export default function StatDisplay({
-  album
+  album,className
 }: {
-  album: Album
+  album: Album,className?:string
 }) {
-  return (  
-    <div className="grid grid-cols-4 ">
-      
-        <div className={`flex items-center rounded-md gap-2 ${album.color.rank}`}>
+  return (
+    <div className={`grid grid-cols-4 h-full gap-3 box-border py-1.5 ${className}`}>
+      <div className={`flex items-center rounded-md gap-2 ${album.color.rank}`}>
           <Medal />
           {album.rank}
         </div>
@@ -21,10 +20,10 @@ export default function StatDisplay({
           <Calendar />
           {album.releaseDate}
         </div>
-        <div className={`flex items-center rounded-md gap-2 `}>
-          <Music />
+        <div className={`flex items-center rounded-md `}>
+          <Music className="pr-2"/>
           {album.genres.map((genre,index)=>{
-            return <Badge key={genre} className={`${album.color.genres[index]}`} variant="default">{genre}</Badge>
+            return <Badge key={genre} className={`text-sm ${album.color.genres[index]}`} variant="outline">{genre}</Badge>
           })}
         </div>
         <div className={`flex items-center rounded-md gap-2 ${album.color.type}`}>
