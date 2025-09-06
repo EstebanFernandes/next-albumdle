@@ -1,0 +1,46 @@
+{
+  "HomePage": {
+    "title": "Your guessing game about music albums",
+    "subtitle": "Try to guess today's random album from the Rolling Stones' best 500 albums of all time",
+    "button": "Right here"
+  },
+  "gamePage":{
+    "title": "Guess today's album",
+    "subtitle": "To play, simply enter an album title in the field below and click \"Guess.\"",
+    "input": "Search for an album or artist",
+    
+    "attemptsLeft": "Attempts left",
+    "attemptsList": "Attempts list",
+    "currentInformation": {
+      "title": "Current information",
+      "artist" : "Artist",
+      "tooltips": {
+        "rank" : "Ranking of the album",
+        "year" : "Release year",
+        "albumType" : "Album type: Studio, Compilation, Live...",
+        "genre" : "Album genre(s)",
+        "memberCount":"Number of members",
+        "location":"Recording location",
+        "label" : "Label that produced the album"
+      }
+    },
+    "gameOver":{
+      "title": "The album was",
+       "comeOver": "Come back tomorrow to guess a new album!",
+       "win": {
+         "title": "Congratulations!",
+         "message": "You guessed the album!"
+       },
+       "lose": {
+         "title": "Loser!",
+         "message": "You didn't guess the album."
+       }
+    }
+  },
+  "tools":{
+    "autoComplete": {
+      "placeholder": "Search for an album or artist",
+      "button": "Submit Guess"
+    }
+  }
+}

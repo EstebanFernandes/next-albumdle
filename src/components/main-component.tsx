@@ -17,6 +17,7 @@ import { createDefaultMainStat, createDefaultStat, Stat } from "../types/stat";
 import StatMainDisplay from "./display-stat";
 import { Separator } from "./ui/separator";
 import { Dialog, DialogContent, DialogTrigger,DialogTitle,DialogHeader } from "./ui/dialog";
+import { useTranslations } from "next-intl";
 
 
 
@@ -39,7 +40,7 @@ export function MainComponent({albums}: {albums: Album[]}) {
   const beginTransition=`transition-opacity duration-500 ${isFirstAttempt ? "opacity-0" : "opacity-100"}
   ${isFirstAttempt ? "pointer-events-none" : ""}`
   
-
+  const t = useTranslations("gamePage");
   async function startGameClientSide() {
     setFullAutoCompleteList( albums.map((album) => ({
     value: album.id.toString(),
@@ -111,15 +112,15 @@ function displayLastDialog(ClientLastUpdate: GameClientLastUpdate | null)
   if( !ClientLastUpdate) return;
 const hasWin = ClientLastUpdate.hasWin;
 const album = ClientLastUpdate.answer;
-  const title = hasWin ? "Congratulations !" : "Game Over";
-  const message = hasWin ? `You guessed  it right !` : `Loser`;
+  const title = hasWin ? t("gameOver.win.title") : t("gameOver.lose.title");
+  const message = hasWin ? t("gameOver.win.message") : t("gameOver.lose.message");
   album.color = createDefaultStat()
   return (
    <div>
           <p>{title}</p>
         <p>{message}</p>
-        The album was <AlbumDisplay album={album} />
-        Come tomorrow for the next guess !
+       {t("gameOver.title")} <AlbumDisplay album={album} />
+        <p>{t("gameOver.comeOver")}</p>
 </div>
   );
 }
@@ -128,7 +129,7 @@ function displayCurrentInformation(knownStat: Stat)
 {
   return (
    <div>
-    <p className={` ${beginTransition}`}>Current information</p>
+    <p className={` ${beginTransition}`}>{t("currentInformation.title")}</p>
          <StatMainDisplay  stat={knownStat}/>
 </div>
   );
@@ -138,10 +139,11 @@ function displayCurrentInformation(knownStat: Stat)
 
   
 	return (
-		<div className=" w-[70vw] lg:w-[50vw] md:w-[50vw]  h-full text-xs sm:text-sm md:text-lg">
+		<div className=" w-[100vw] lg:w-[50vw] md:w-[50vw] sm:w-[70vw] h-full text-xs sm:text-sm md:text-lg
+    px-2">
             <div className="flex flex-col justify-center items-center gap-2 mt-5">
-                <div className=" text-xl sm:text-2xl md:text-3xl">Guess todays&apos;album ! </div>
-                <div className="text-md sm:text-lg md:text-xl"> To play, simply enter an album title in the field below and click &quot;Guess&quot;.</div>
+                <div className=" text-xl sm:text-2xl md:text-3xl">{t("title")} </div>
+                <div className="text-md sm:text-lg md:text-xl">{t("subtitle")}</div>
             </div>
             <div className="flex flex-col justify-center items-center gap-4 mt-6">
              <AutoComplete fullList={fullAutoCompleteList} onEnter={handleEnter}/>
@@ -156,14 +158,14 @@ function displayCurrentInformation(knownStat: Stat)
                        ></div>
                      ))}
                 </div>
-                 Attempts lefts : { gameState && gameState.maxAttempts! - gameState.attempts.length!}
+                  {t("attemptsLeft")}: { gameState && gameState.maxAttempts! - gameState.attempts.length!}
                 </div>
              <div className={`flex flex-col justify-center items-center gap-4 w-full
               ${beginTransition}`}>
              {clientLastUpdate===null && displayCurrentInformation(displayInfo)}
              {clientLastUpdate && displayLastDialog(clientLastUpdate)}
              <Separator className={`  ${beginTransition}`}></Separator>
-             <p className="text-2xl"> Attempts list</p>
+             <p className="text-2xl"> {t("attemptsList")}</p>
         <div className="flex flex-col-reverse gap-4 w-full mb-4">
         {gameState?.attempts.map((album, index) => (
     <AlbumDisplay key={album.id} album={album} />

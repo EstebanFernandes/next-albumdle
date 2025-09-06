@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
-
+import createNextIntlPlugin from 'next-intl/plugin';
 const nextConfig: NextConfig = {
+  //Image config enable nextJs server to fetch image from the following URLs
   images: {
     remotePatterns: [
       {
@@ -12,5 +13,5 @@ const nextConfig: NextConfig = {
     ],
   },
 };
-
-export default nextConfig;
+const withNextIntl = createNextIntlPlugin();
+export default withNextIntl(nextConfig);

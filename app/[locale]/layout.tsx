@@ -5,6 +5,10 @@ import { Header } from "@/src/components/header";
 import { Background } from "@/src/components/background";
 import { getAlbums } from "@/src/lib/csv";
 import { ThemeProvider } from "next-themes";
+import {NextIntlClientProvider} from 'next-intl';
+import { Locale, routing } from "@/src/i18n/routing";
+import { notFound } from "next/navigation";
+import { getMessages } from "next-intl/server";
 /*
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,21 +32,31 @@ export const metadata: Metadata = {
   description: "Guess the album ",
 };
 
-export default function RootLayout({
+export default async function LocaleLayout({
   children,
-}: Readonly<{
+  params
+}: {
   children: React.ReactNode;
-}>) {
+  params: { locale: string };
+}){
+const { locale } = await params;
+
+if(!routing.locales.includes(locale as Locale)){
+    notFound()
+  }
+  const messages = await getMessages();
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang={locale} suppressHydrationWarning>
       <body 
         className={`${josefin_Sans.className} antialiased flex flex-col justify-center items-center w-full h-full`}
       >
-        <ThemeProvider attribute="class" enableSystem defaultTheme="system">
-        <Header />
-        <Background albums={getAlbums(40)} />
-        {children}
-        </ThemeProvider>
+       <NextIntlClientProvider locale={locale} messages={messages}>
+          <ThemeProvider attribute="class" enableSystem defaultTheme="system">
+          <Header />
+          <Background albums={getAlbums(40)} />
+          {children}
+          </ThemeProvider>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

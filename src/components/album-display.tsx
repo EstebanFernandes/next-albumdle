@@ -24,8 +24,7 @@ export function AlbumDisplay({ album }: { album: Album }) {
 					<p className="font-semibold">{album.title}</p>
 					<p className="italic text-muted-foreground">{album.artist}</p>
 				</div>
-				<StatDisplay album={album} className="w-6/10"></StatDisplay>
-
+				<StatDisplay album={album} className="w-5/10"></StatDisplay>
 		</div>
 	);
 }

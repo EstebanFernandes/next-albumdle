@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react"
 import { Card } from "./ui/card"
 import { Input } from "./ui/input"
 import { Button } from "./ui/button"
+import { useTranslations } from "next-intl"
 
 export default function AutoComplete({
   fullList,
@@ -18,6 +19,7 @@ export default function AutoComplete({
   const [activeIndex, setActiveIndex] = useState(-1)
   const inputRef = useRef<HTMLInputElement>(null)
 
+  const t = useTranslations("tools.autoComplete");
   useEffect(() => {
     if (open && inputRef.current) inputRef.current.focus()
   }, [open])
@@ -84,7 +86,7 @@ export default function AutoComplete({
         <div className="w-full h-full flex flex-col justify-center items-center ">
         <Input
           ref={inputRef}
-          placeholder="Search an album or an artist"
+          placeholder={t("placeholder")}
           value={inputValue}
           onChange={(e) => handleChanges(e.target.value)}
           onKeyDown={handleKeyDown}
@@ -107,7 +109,7 @@ export default function AutoComplete({
           </Card>
         )}
         </div>
-      <Button onClick={enterPressed}>Guess</Button></div>
+      <Button onClick={enterPressed}>{t("button")}</Button></div>
     </div>
   )
 }
