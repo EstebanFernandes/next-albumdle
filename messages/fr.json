@@ -4,42 +4,55 @@
 		"subtitle": "Essayez de deviner l'album aléatoire d'aujourd'hui parmi les 500 meilleurs albums de tous les temps d'après le magazine Rolling Stones",
 		"button": "Cliquez ici"
 	},
-	"gamePage":{
-		"title": "Devine l'album du jour",
-		"subtitle": "Pour commencer, entrer votre réponse ci-dessous",
+	"gamePage": {
+		"title": "Devinez l'album du jour",
+		"subtitle": "Pour commencer, entrez votre réponse ci-dessous",
+		"subtitle2": "Aidez-vous des informations déjà découvertes pour affiner votre recherche",
 		"input": "Chercher un album ou un artiste",
 		"attemptsLeft": "Tentatives restantes",
 		"attemptsList": "Liste des tentatives",
 		"currentInformation": {
 			"title": "Informations actuelles",
-			"artist" : "Artiste",
+			"artist": "Artiste",
+			"hints": "Indices ",
+			"hintAvailable": "Indice disponible dans ",
+			"songs": "Morceaux populaires",
+			"cover": "Pochette",
 			"tooltips": {
-				"rank" : "Classement",
-				"year" : "Année de sortie",
-				"albumType" : "Type d'album : Studio, Compil, Live...",
-				"genre" : "Genre(s) de l'album",
-			"memberCount":"Nombre de membres",
-			"location":"Lieu de l'enregistrement",
-			"label" : "Label qui a produit l'album"
-		}
+				"rank": "Classement",
+				"year": "Année de sortie",
+				"albumType": "Type d'album : Studio, Compil, Live...",
+				"genre": "Genre(s) de l'album",
+				"memberCount": "Nombre de membres",
+				"location": "Lieu de l'enregistrement",
+				"label": "Label qui a produit l'album"
+			}
 		},
-		"gameOver":{
+		"gameOver": {
 			"title": "L'album était",
-				"comeOver": "Revenez demain pour deviner un nouvel album !",
-				"win": {
-					"title": "Félicitations !",
-					"message": "Vous avez deviné l'album !"
-				},
-				"lose": {
-					"title": "Gros naze !",
-					"message": "Vous n'avez pas deviné l'album."
-				}
+			"comeOver": "Revenez pour un nouvel album dans : ",
+			"win": {
+				"title": "Félicitations !",
+				"message": "Vous avez deviné l'album !"
+			},
+			"lose": {
+				"title": "Gros naze !",
+				"message": "Vous n'avez pas deviné l'album."
+			}
 		}
-} ,
-	"tools":{
+	},
+	"adminPage":{
+		"title" : "Tableau de bord administrateur",
+		"todayAlbum" :"Album du jour",
+		"try":"Nombre d'essais",
+		"guess" : "Nombre de personnes ayant trouvés"
+	},
+	"tools": {
 		"autoComplete": {
 			"placeholder": "Rechercher un album ou un artiste",
 			"button": "Soumettre la réponse"
-		}
-  }
+		},
+		"available": "Disponible dans ",
+		"attempts": "essais"
+	}
 }

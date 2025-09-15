@@ -2,130 +2,149 @@
 // This file should contain game's logic, as choosing the right album based on user input. and decide the album of the day
 import { Album } from "../types/albums";
 
-import { getAlbums } from "./csv";
-import { isSameDayAsToday } from "./utils";
-import { createDefaultMainStat, createDefaultStat, Stat } from "../types/stat";
 import crypto from 'crypto';
-import { createDefaultGameState, createFirstGameState, GameClientFirstInformation, GameClientLastUpdate, GameClientUpdate, GameState } from "../types/game-state";
+import { AlbumOfTheDay } from "../types/game";
+import { createDefaultGameState, createFirstGameState, GameClientFirstInformation, GameClientLastUpdate, GameClientUpdate, GameState, hintState } from "../types/game-state";
+import { createDefaultMainStat, createDefaultStat, Stat } from "../types/stat";
+import { updateAlbumInDatabase, updateTodayAlbum } from "../utils/supabase";
+import { getAlbums } from "./csv";
+import { todayDateString } from "./utils";
+
 
 
 //This function will handle games logic, it will be store in the main page
-let album :Album | null = null;
+let albumOfTheDay: AlbumOfTheDay | null = null;
 const albums = getAlbums();
 const lastDate = new Date();
 
-const correct:string ="bg-[#61B35B]"
-const incorrect:string ="bg-[#D83B3B]"
-const partial:string ="bg-[#FFB900]"
+const correct: string = "bg-[#61B35B]"
+const incorrect: string = "bg-[#D83B3B]"
+const partial: string = "bg-[#FFB900]"
 const GAME_SECRET = process.env.GAME_SECRET!;
-export async function updateTodayAlbum()
-{
-    if(album!==null && isSameDayAsToday(lastDate))
-        return album;
+export async function checkTodayAlbum() {
+  if (albumOfTheDay === null) {
+   albumOfTheDay = await updateTodayAlbum();
+    return albumOfTheDay
+  }
+  const todaydate = todayDateString()
+  if (todaydate === albumOfTheDay.date)
+    return albumOfTheDay;
 
-    
-    if (!albums.length) return null;
-    // Get the current date in UTC YYYY-MM-DD format
-    const now = new Date();
-    const daySeed = now.getUTCFullYear() + '-' +
-        String(now.getUTCMonth() + 1).padStart(2, '0') + '-' +
-        String(now.getUTCDate()).padStart(2, '0');
-    let hash = 0;
-    for (let i = 0; i < daySeed.length; i++) {
-        hash = (hash << 5) - hash + daySeed.charCodeAt(i);
-        hash |= 0;
-    }
-    const index = Math.abs(hash) % albums.length;
-    album = albums[index];
-    console.log(`Today's album is: ${album.title} by ${album.artist}`);
+  if (todaydate > albumOfTheDay.date) {
+    updateAlbumInDatabase(albumOfTheDay)
+  }
+  albumOfTheDay = await updateTodayAlbum()
+  return albumOfTheDay
 }
 
 //Function calls by the client main component to fetch various information (date, number of attempts )
-export async function startGame(){
-    const state = createDefaultGameState();
-    return createFirstGameState(signState(state));
+export async function startGame() {
+  const state = createDefaultGameState();
+  state.hints = [{ type: 'cover', label: "cover", iconName: "Image", available: 2 }, { type: 'tracks', label: "songs", iconName: "AudioLines", available: 3 }];
+  return createFirstGameState(signState(state));
 }
 
+export async function getTodayAlbum()
+{
+  if(albumOfTheDay)
+    return albumOfTheDay;
+  return await checkTodayAlbum()
+}
 
 // --- Main server action ---
 export async function submitGuess(
   guessId: number,
   secure: { data: string; signature: string }
-) : Promise<GameClientUpdate | GameClientFirstInformation | GameClientLastUpdate>
-{
+): Promise<GameClientUpdate | GameClientFirstInformation | GameClientLastUpdate> {
   // Verify the incoming state
   if (!verifyState(secure.data, secure.signature)) {
     throw new Error("Invalid or tampered state");
   }
 
   const state: GameState = JSON.parse(secure.data);
-  if(album===null)
-    updateTodayAlbum()
-if(album===null)
-  {
-    const lastState : GameClientLastUpdate = {
+  if (albumOfTheDay === null)
+    await checkTodayAlbum()
+  if (albumOfTheDay === null) {
+    const lastState: GameClientLastUpdate = {
       type: 'last',
       hasWin: false,
       answer: albums[guessId],
       secure: signState(state),
       knownStat: createDefaultStat(),
-      isGameOver: true
+      isGameOver: true,
+      dateToNextUpdate: new Date(Date.UTC(lastDate.getUTCFullYear(), lastDate.getUTCMonth(), lastDate.getUTCDate() + 1)),
+      try : 0,
+      guess : 0
     };
     return lastState;
-   }
+  }
 
   // --- Validate the guess ---
-console.log(albums[guessId].artist)
-const albumOfTheDay = album;
-if(state.isGameOver)
-{
-  
-}
-const guess = albums[guessId];  
 
+  const guess = albums[guessId];
+  const album = albumOfTheDay.album
+  console.log(`Guess try ${guess.title} by ${guess.artist}`)
 
-  updateState(state,guess);
-const isCorrect = state.attempts.some(a => a.id === albumOfTheDay.id);
-
-if(state.isGameOver || isCorrect)
-  {
-    const lastState : GameClientLastUpdate = {
+  await updateState(state, guess);
+  const isCorrect = state.attempts.some(a => a.id === album.id);
+  console.log(`Status of the guess : ${isCorrect.toString()}`)
+  if (state.isGameOver || isCorrect) {
+    albumOfTheDay.try++
+    if(isCorrect) albumOfTheDay.guess++
+    updateAlbumInDatabase(albumOfTheDay)
+    const lastState: GameClientLastUpdate = {
       type: 'last',
       hasWin: isCorrect,
-      answer: albumOfTheDay,
+      answer: album,
       secure: signState(state),
       knownStat: calculateNewStat(state),
-      isGameOver: true
+      isGameOver: true,
+      dateToNextUpdate: new Date(Date.UTC(lastDate.getUTCFullYear(), lastDate.getUTCMonth(), lastDate.getUTCDate() + 1)),
+      try : albumOfTheDay.try,
+      guess : albumOfTheDay.guess
     };
     return lastState;
-   }
+  }
 
 
-    const clientInfo : GameClientUpdate = {
+  const clientInfo: GameClientUpdate = {
     type: 'update',
-    attemptVerify :guess,
+    attemptVerify: guess,
     knownStat: calculateNewStat(state),
     secure: signState(state),
-    isGameOver : state.isGameOver
+    isGameOver: state.isGameOver
   };
 
   return clientInfo;
 }
 
-function updateState(state: GameState, guess: Album) {
+async function updateState(state: GameState, guess: Album) {
   // Update the game state as needed
   state.attempts.push(guess);
-  console.log(state.attempts.length, state.maxAttempts)
-    if (state.attempts.length >= state.maxAttempts) {
-        state.isGameOver = true;  
-        console.log("Game over here")
-    }
-    updateColorOfAlbum(guess);
+  if (state.attempts.length >= state.maxAttempts) {
+    state.isGameOver = true;
+  }
+  updateColorOfAlbum(guess);
+  updateHints(state.hints);
 }
 
+function updateHints(hints: hintState[]) {
+  if (albumOfTheDay)
+    for (const hint of hints) {
+      hint.available--;
+      if (hint.available < 0) hint.available = 0;
 
+      if (hint.type === "cover" && hint.available === 0) {
+        hint.value = albumOfTheDay?.imageHint ?? "";
+      }
 
-function numericLogic(values :number[], aimValue : number, isReverse = false) {
+      if (hint.type === "tracks" && hint.available === 0) {
+        hint.value = albumOfTheDay?.album.top_songs.join(";") || "";
+      }
+    }
+}
+
+function numericLogic(values: number[], aimValue: number, isReverse = false) {
   if (!Array.isArray(values) || values.length === 0) {
     return 'Unknown';
   }
@@ -136,18 +155,18 @@ function numericLogic(values :number[], aimValue : number, isReverse = false) {
   }
   if (values.includes(aimValue)) {
 
-     return String(aimValue)
+    return String(aimValue)
   }
 
   if (values.length === 1) {
     if (isReverse) {
-      const direction = values[0] < aimValue ?  "↓" : "↑";
+      const direction = values[0] < aimValue ? "↓" : "↑";
       return `${values[0]} ${direction}`;
     } else {
       const direction = values[0] > aimValue ? "↓" : "↑";
       return `${values[0]} ${direction}`;
+    }
   }
-}
 
   let minRange = null;
 
@@ -184,21 +203,21 @@ function numericLogic(values :number[], aimValue : number, isReverse = false) {
     }
   }
 
-//True = up, False = down
+  //True = up, False = down
   let direction = closest < aimValue ? "↑" : "↓";
   if (isReverse)
     direction = closest > aimValue ? "↑" : "↓";
   return `${closest} ${direction}`;
 }
 
-function genreLogic(genres :string[], aimGenres:string[]) : string[] {
+function genreLogic(genres: string[], aimGenres: string[]): string[] {
   if (!Array.isArray(genres) || genres.length === 0 || !aimGenres) {
     return ['?'];
   }
 
   const genresSet = new Set(genres.map(g => g.toLowerCase()));
-  const returns:string[] = []
-  for(let i = 0; i < aimGenres.length; i++) {
+  const returns: string[] = []
+  for (let i = 0; i < aimGenres.length; i++) {
     const g = aimGenres[i];
     if (genresSet.has(g.toLowerCase())) {
       returns.push(g);
@@ -212,14 +231,14 @@ function genreLogic(genres :string[], aimGenres:string[]) : string[] {
 
 
 
-function memberLogic(members:number[], aimMember: number):string {
+function memberLogic(members: number[], aimMember: number): string {
   if (!Array.isArray(members) || members.length === 0 || !aimMember) {
     return '?';
   }
 
   const found = members.find(member => member === aimMember);
-  if(!found)
-    return '?'; 
+  if (!found)
+    return '?';
 
   if (Number(aimMember) === 1)
     return "Solo";
@@ -227,9 +246,9 @@ function memberLogic(members:number[], aimMember: number):string {
     return "Duo";
   else
     return `Group (${aimMember})`;
-  }
+}
 
-function capitalize(stringToCapitalize:string) {
+function capitalize(stringToCapitalize: string) {
   return stringToCapitalize.charAt(0).toUpperCase() + stringToCapitalize.slice(1);
 }
 
@@ -254,9 +273,10 @@ function verifyState(data: string, signature: string) {
 }
 
 function calculateNewStat(state: GameState): Stat {
-    const returnStat = createDefaultMainStat()
-    if(album===null)
-        return returnStat
+  const returnStat = createDefaultMainStat()
+  if (albumOfTheDay === null)
+    return returnStat
+  const album = albumOfTheDay.album;
   //ARTIST NAME LOGIC
   const artists = [...new Set(state.attempts.map(a => a.artist).filter(Boolean))];
   returnStat.artist = (artists.includes(album?.artist)) ? album?.artist : "???";
@@ -265,25 +285,25 @@ function calculateNewStat(state: GameState): Stat {
   const ranks = state.attempts.map(a => Number(a.rank)).filter(n => !isNaN(n));
 
   returnStat.rank = numericLogic(ranks, album?.rank)
-  
+
   // RELEASE YEAR LOGIC
   const releases = state.attempts.map(a => Number(a.releaseDate)).filter(n => !isNaN(n));
   returnStat.date = numericLogic(releases, album?.releaseDate);
-  
+
   const genres = Array.from(
-  new Set(
-    state.attempts
-      .map(a => a.genres)        // get the array of genres for each attempt
-      .filter(Boolean)           // remove undefined or null
-      .flat()                    // flatten array of arrays into a single array
-      .map(g => g.trim())        // trim whitespace
-      .filter(g => g.length > 0) // remove empty strings
-  )
-);
+    new Set(
+      state.attempts
+        .map(a => a.genres)        // get the array of genres for each attempt
+        .filter(Boolean)           // remove undefined or null
+        .flat()                    // flatten array of arrays into a single array
+        .map(g => g.trim())        // trim whitespace
+        .filter(g => g.length > 0) // remove empty strings
+    )
+  );
 
 
   returnStat.genres = genreLogic(genres, album?.genres);
-  
+
 
   // TYPE LOGIC
   const types = state.attempts.map(a => a.type).filter(Boolean);
@@ -306,39 +326,41 @@ function calculateNewStat(state: GameState): Stat {
 
 
 function updateColorOfAlbum(albumToTry: Album) {
-        albumToTry.color.artist = (albumToTry.artist === album?.artist) ? correct : incorrect;
-        
-        albumToTry.color.rank = (albumToTry.rank === album?.rank) ? correct : incorrect;
 
-        albumToTry.color.date = (albumToTry.releaseDate === album?.releaseDate) ? correct : incorrect;
-        
-        //Here we gonna compare each genre
-        
-        
-        const found=0;
-        const albumGenres = album?.genres|| [];
-        albumToTry.color.genres = []
-        for(const genre of albumToTry.genres)
-        {
-            if(albumGenres.includes(genre))
-              albumToTry.color.genres.push(correct);
-            else
-              albumToTry.color.genres.push(incorrect);
-        }
+  albumToTry.color.artist = (albumToTry.artist === albumOfTheDay?.album.artist) ? correct : incorrect;
 
-        
-        albumToTry.color.type = (albumToTry.type === album?.type) ? correct : incorrect;
+  albumToTry.color.rank = (albumToTry.rank === albumOfTheDay?.album.rank) ? correct : incorrect;
 
-        const tryCount = albumToTry.memberCount; const albumCount = album?.memberCount || 0;
-        if(tryCount===albumCount)
-            albumToTry.color.memberCount = correct;
-        else if (Math.abs(tryCount-albumCount)===1) //Little difference
-            albumToTry.color.memberCount = partial;
-        else
-            albumToTry.color.memberCount = incorrect;
-        
-        albumToTry.color.location = (albumToTry.country === album?.country) ? correct : incorrect;
-        
-        albumToTry.color.label = (albumToTry.label === album?.label) ? correct : incorrect;
+  albumToTry.color.date = (albumToTry.releaseDate === albumOfTheDay?.album.releaseDate) ? correct : incorrect;
+
+  //Here we gonna compare each genre
+
+
+  const found = 0;
+  const albumGenres = albumOfTheDay?.album.genres || [];
+  albumToTry.color.genres = []
+  for (const genre of albumToTry.genres) {
+    if (albumGenres.includes(genre))
+      albumToTry.color.genres.push(correct);
+    else
+      albumToTry.color.genres.push(incorrect);
+  }
+
+
+  albumToTry.color.type = (albumToTry.type === albumOfTheDay?.album.type) ? correct : incorrect;
+
+  const tryCount = albumToTry.memberCount; const albumCount = albumOfTheDay?.album.memberCount || 0;
+  if (tryCount === albumCount)
+    albumToTry.color.memberCount = correct;
+  else if (Math.abs(tryCount - albumCount) === 1) //Little difference
+    albumToTry.color.memberCount = partial;
+  else
+    albumToTry.color.memberCount = incorrect;
+
+  albumToTry.color.location = (albumToTry.country === albumOfTheDay?.album.country) ? correct : incorrect;
+
+  albumToTry.color.label = (albumToTry.label === albumOfTheDay?.album.label) ? correct : incorrect;
 
 }
+
+

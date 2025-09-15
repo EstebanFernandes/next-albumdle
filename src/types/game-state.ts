@@ -1,11 +1,21 @@
+import * as Icons from "lucide-react";
 import { Album } from "./albums";
-import { createDefaultMainStat, createDefaultStat, Stat } from "./stat";
-
+import { createDefaultMainStat, Stat } from "./stat";
 export interface GameState {
   gameType: GameType;
   attempts: Album[];
   isGameOver: boolean;
   maxAttempts: number;
+  hints: hintState[]
+}
+
+export interface hintState {
+  type:'cover'|'tracks';
+  label:string;
+  iconName: keyof typeof Icons; // any valid Lucide icon name
+  available:number;
+  value?:string;
+
 }
 
 export interface GameClientFirstInformation {
@@ -30,6 +40,9 @@ export interface GameClientLastUpdate {
   knownStat: Stat;
   secure: { data: string; signature: string };
   isGameOver: true;
+  dateToNextUpdate: Date;
+  try:number;
+  guess:number;
 }
 
 
@@ -50,7 +63,8 @@ export function createDefaultGameState() : GameState
     gameType: GameType.Main,
     attempts: [],
     isGameOver: false,
-    maxAttempts: 6
+    maxAttempts: 6,
+    hints : []
   };
 }
 

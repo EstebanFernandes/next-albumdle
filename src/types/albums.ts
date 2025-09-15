@@ -6,8 +6,8 @@ export interface Album {
   rank: number;
   type: string;
   memberCount: number;
-  country:string;
-  label:string;
+  country: string;
+  label: string;
   small_thumbnail: string;
   large_thumbnail: string;
   genres: string[];
@@ -18,16 +18,15 @@ export interface Album {
 }
 
 
-export function createStat(album: Album): Stat
-{
-   return {
-                artist: album.artist,
-                rank: album.rank.toString(),
-                date: album.releaseDate.toString(),
-                genres: album.genres,
-                type: album.type,
-                memberCount: album.memberCount.toString(),
-                location: album.country,
-                label: album.label
-            };
+export function createStat(album: Album): Stat {
+  return {
+    artist: album.artist,
+    rank: album.rank.toString(),
+    date: album.releaseDate.toString(),
+    genres: album.genres,
+    type: album.type,
+    memberCount: album.memberCount.toString(),
+    location: album.country,
+    label: album.label
+  };
 }

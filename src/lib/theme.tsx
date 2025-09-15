@@ -1,10 +1,9 @@
 "use client"
 
-import { useTheme } from "next-themes";
-import { Button } from "../components/ui/button"
 import { MoonIcon, SunIcon } from "lucide-react";
-import { Switch } from "../components/ui/switch";
+import { useTheme } from "next-themes";
 import { useId, useState } from "react";
+import { Switch } from "../components/ui/switch";
 /*
 export function ThemeToggle()
 {

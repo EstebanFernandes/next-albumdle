@@ -12,6 +12,7 @@ let hasBeenCalled = false;
 export function getAlbums(numberOfAlbums?: number): Album[] {
   if (!hasBeenCalled) {
     hasBeenCalled = true;
+    console.log("This has never been called, the CSV will be read out")
     const csvPath = path.join(process.cwd(), "data", "albums.csv");
     const csvFile = fs.readFileSync(csvPath, "utf8");
     const result = Papa.parse<RawAlbumRow>(csvFile, { header: true }).data;

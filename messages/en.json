@@ -14,6 +14,10 @@
     "currentInformation": {
       "title": "Current information",
       "artist" : "Artist",
+      "hints" : "Hints :",
+      "hintAvailable": "Hint available in ",
+      "songs" : "Popular tracks",
+      "cover": "Cover",
       "tooltips": {
         "rank" : "Ranking of the album",
         "year" : "Release year",
@@ -26,7 +30,7 @@
     },
     "gameOver":{
       "title": "The album was",
-       "comeOver": "Come back tomorrow to guess a new album!",
+       "comeOver": "Next album in : ",
        "win": {
          "title": "Congratulations!",
          "message": "You guessed the album!"
@@ -37,6 +41,12 @@
        }
     }
   },
+	"adminPage":{
+		"title" : "Admin dashboard",
+		"todayAlbum" :"Today's album",
+		"try":"Number of attempts",
+		"guess" : "Number of guess"
+	},
   "tools":{
     "autoComplete": {
       "placeholder": "Search for an album or artist",
