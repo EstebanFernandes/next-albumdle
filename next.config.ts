@@ -10,6 +10,11 @@ const nextConfig: NextConfig = {
         port: "",       // optional
         pathname: "/**", // optional wildcard
       },
+       {
+        protocol: "https",
+        hostname: "yswbiepvzlzxgyyuffpx.supabase.co",
+        pathname: "/storage/v1/object/public/image_hint/**", // only this folder
+      }
     ],
   },
 };

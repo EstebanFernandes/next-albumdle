@@ -10,7 +10,7 @@ export const supabase = createClient<Database>(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY! // or ANON KEY depending on use
 )
-
+const BUCKET = "image_hint"; // your bucket name
 
 function assertNoError<T>(
   result: { data: T | null; error: PostgrestError | null },
@@ -55,14 +55,14 @@ export async function updateTodayAlbum(): Promise<AlbumOfTheDay | null> {
     const albums = getAlbums()
     if (todayTry.album_id) {
       const todayAlbum = albums[todayTry.album_id]
-      console.log(`Album of the day is ${todayAlbum.title} by ${todayAlbum.artist}` )
+      console.log(`Album of the day is ${todayAlbum.title} by ${todayAlbum.artist}`)
       return {
         id: todayTry.id.toString(),
         date: todaydate.toString(),
         album: todayAlbum,
         imageHint: await getHintImage(todayAlbum.large_thumbnail, 4),
         try: todayTry.try ?? 0,
-        guess : todayTry.guess ?? 0
+        guess: todayTry.guess ?? 0
       }
     }
     console.error(`Row with ID : ${todayTry.id} exist without any album ID`)
@@ -83,19 +83,47 @@ export async function updateTodayAlbum(): Promise<AlbumOfTheDay | null> {
   const insertRes = await supabase.from("rolling_stones_magazine").insert({ album_id: (await albumOfTheDay).album.id, try: 0, guess: 0, date: todaydate }).select()
   const insertData = assertNoError(insertRes, "Inserting new album of the day in the database ")
   albumOfTheDay.id = insertData[0].id.toString()
-  console.log(`Album of the day is ${albumOfTheDay.album.title} by ${albumOfTheDay.album.artist}` )
+  console.log(`Album of the day is ${albumOfTheDay.album.title} by ${albumOfTheDay.album.artist}`)
   return albumOfTheDay;
 }
 
-export async function updateAlbumInDatabase(album:AlbumOfTheDay)
-{
+export async function updateAlbumInDatabase(album: AlbumOfTheDay) {
   console.log(`updating BDD album of the day with ID ${album.id}, corresponding to ${album.album.title} by ${album.album.artist}`)
   const res = await supabase
-  .from("rolling_stones_magazine")
-  .update({ 
-    try: album.try,
-    guess : album.guess
-   })
-  .eq('id', Number.parseInt(album.id))
-  const data = assertNoError(res,"Updating row of postgres database")
+    .from("rolling_stones_magazine")
+    .update({
+      try: album.try,
+      guess: album.guess
+    })
+    .eq('id', Number.parseInt(album.id))
+  const data = assertNoError(res, "Updating row of postgres database")
+}
+
+export async function uploadToSupabase(fileName: string, buffer: Buffer) {
+  // Check if file already exists
+  const { data: existingData, error: listError } = await supabase
+    .storage
+    .from(BUCKET)
+    .list("", { search: fileName });
+
+  if (listError) throw listError;
+  if (existingData && existingData.length > 0) {
+    // Return existing public URL
+    return supabase.storage.from(BUCKET).getPublicUrl(fileName).data.publicUrl;
+  }
+
+  // Upload the file
+  const { error: uploadError } = await supabase
+    .storage
+    .from(BUCKET)
+    .upload(fileName, buffer, {
+      contentType: "image/jpeg",
+      upsert: true,
+    });
+
+  if (uploadError) throw uploadError;
+
+  // Return public URL
+  return supabase.storage.from(BUCKET).getPublicUrl(fileName).data.publicUrl;
+
 }
