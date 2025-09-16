@@ -1,28 +1,29 @@
 import createMiddleware from "next-intl/middleware";
 import { routing } from "./src/i18n/routing";
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { NextRequest } from "next/server";
 import { decodeAdminCookie } from "./src/lib/admin"; // <-- helper functions we wrote
-
+import {redirect} from './src/i18n/navigation';
+import { getLocale } from "next-intl/server";
 const intlMiddleware = createMiddleware(routing);
 
-export default function middleware(request: NextRequest) {
+export default async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-
-  // Protect /admin routes except login
-  if (pathname.startsWith("/admin") && !pathname.startsWith("/admin/login")) {
+  // Detect current locale
+  const locale = await getLocale();
+  // Only protect /admin (and subroutes), not /admin/login
+  if (pathname.includes("/admin") ) {
     const cookie = request.cookies.get("admin-auth")?.value;
-
-    const isAdmin = cookie ? decodeAdminCookie(cookie) : false;
+    const isAdmin = cookie ? await decodeAdminCookie(cookie) : false;
     if (!isAdmin) {
-      const loginUrl = new URL("/admin/login", request.url);
-      return NextResponse.redirect(loginUrl);
+      console.log(`Not admin → redirecting to /${locale}/admin/login`);
+      return redirect({ href: "/admin/login", locale });
     }
   }
 
-  // Fall back to next-intl middleware for language handling
   return intlMiddleware(request);
-}
+  }
+
 
 export const config = {
   // Match all pathnames except for
