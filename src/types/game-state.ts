@@ -27,7 +27,7 @@ export interface GameClientFirstInformation {
 
 export interface GameClientUpdate {
   type: 'update';
-  attemptVerify: Album;
+  attemptVerify: Album|null;
   knownStat: Stat;
   secure: { data: string; signature: string };
   isGameOver: boolean;

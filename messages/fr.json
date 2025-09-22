@@ -1,58 +1,72 @@
 {
-	"homePage": {
-		"title": "Votre jeu de devinettes sur les albums de musiques",
-		"subtitle": "Essayez de deviner l'album aléatoire d'aujourd'hui parmi les 500 meilleurs albums de tous les temps d'après le magazine Rolling Stones",
-		"button": "Cliquez ici"
-	},
-	"gamePage": {
-		"title": "Devinez l'album du jour",
-		"subtitle": "Pour commencer, entrez votre réponse ci-dessous",
-		"subtitle2": "Aidez-vous des informations déjà découvertes pour affiner votre recherche",
-		"input": "Chercher un album ou un artiste",
-		"attemptsLeft": "Tentatives restantes",
-		"attemptsList": "Liste des tentatives",
-		"currentInformation": {
-			"title": "Informations actuelles",
-			"artist": "Artiste",
-			"hints": "Indices ",
-			"hintAvailable": "Indice disponible dans ",
-			"songs": "Morceaux populaires",
-			"cover": "Pochette",
-			"tooltips": {
-				"rank": "Classement",
-				"year": "Année de sortie",
-				"albumType": "Type d'album : Studio, Compil, Live...",
-				"genre": "Genre(s) de l'album",
-				"memberCount": "Nombre de membres",
-				"location": "Lieu de l'enregistrement",
-				"label": "Label qui a produit l'album"
-			}
-		},
-		"gameOver": {
-			"title": "L'album était",
-			"comeOver": "Revenez pour un nouvel album dans : ",
-			"win": {
-				"title": "Félicitations !",
-				"message": "Vous avez deviné l'album !"
-			},
-			"lose": {
-				"title": "Gros naze !",
-				"message": "Vous n'avez pas deviné l'album."
-			}
-		}
-	},
-	"adminPage":{
-		"title" : "Tableau de bord administrateur",
-		"todayAlbum" :"Album du jour",
-		"try":"Nombre d'essais",
-		"guess" : "Nombre de personnes ayant trouvés"
-	},
-	"tools": {
-		"autoComplete": {
-			"placeholder": "Rechercher un album ou un artiste",
-			"button": "Soumettre la réponse"
-		},
-		"available": "Disponible dans ",
-		"attempts": "essais"
-	}
+  "homePage": {
+    "title": "Votre jeu de devinettes sur les albums de musiques",
+    "subtitle": "Essayez de deviner l'album aléatoire d'aujourd'hui parmi les 500 meilleurs albums de tous les temps d'après le magazine Rolling Stones",
+    "button": "Cliquez ici"
+  },
+  "gamePage": {
+    "title": "Devinez l'album du jour",
+    "subtitle": "Pour commencer, entrez un album de votre choix ci-dessous",
+    "subtitle2": "Maintenant, aidez-vous des informations déjà découvertes, ainsi que des indices pour affiner votre recherche",
+    "input": "Chercher un album ou un artiste",
+    "attemptsLeft": "Tentatives restantes",
+    "attemptsList": "Liste des tentatives",
+    "currentInformation": {
+      "title": "Informations actuelles",
+      "artist": "Artiste",
+      "hints": "Indices ",
+      "hintAvailable": "Indice disponible dans ",
+      "songs": "Morceaux populaires",
+      "cover": "Pochette",
+      "tooltips": {
+        "rank": "Classement",
+        "year": "Année de sortie",
+        "albumType": "Type d'album : Studio, Compil, Live...",
+        "genre": "Genre(s) de l'album",
+        "memberCount": "Nombre de membres",
+        "location": "Lieu de l'enregistrement",
+        "label": "Label qui a produit l'album"
+      }
+    },
+    "gameOver": {
+      "title": "L'album était",
+      "comeOver": "Revenez pour un nouvel album dans : ",
+      "win": {
+        "title": "Félicitations !",
+        "message": "Vous avez deviné l'album !"
+      },
+      "lose": {
+        "title": "Gros naze !",
+        "message": "Vous n'avez pas deviné l'album."
+      }
+    }
+  },
+  "adminPage": {
+    "title": "Tableau de bord administrateur",
+    "todayAlbum": "Album du jour",
+    "try": "Nombre d'essais",
+    "guess": "Nombre de personnes ayant trouvés",
+    "login": {
+      "title": "Se connecter en tant qu'administrateur",
+      "placeholder": "Entrer le mot de passe administrateur",
+      "button": "Se connecter",
+      "error": "Mauvais mot de passe",
+      "errorWeird": "Erreur incongrue, essayez encore"
+    }
+  },
+  "tools": {
+    "autoComplete": {
+      "placeholder": "Rechercher un album ou un artiste",
+      "button": "Soumettre la réponse",
+      "tooltipSkip": "Passez cette tentative"
+    },
+    "available": "Disponible dans ",
+    "attempts": "essais",
+    "calendar": {
+      "title": "Sélectionner une date"
+    },
+    "albumDisplay": {
+      "albumMissing": "Tentative d'album passée"
+    }
+  }
 }

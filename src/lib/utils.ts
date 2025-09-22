@@ -30,9 +30,15 @@ export function todayDateString(): string {
 }
 
 
-export function dateAsNumber(date: Date): number {
-  return Number.parseInt(dateAsString(date))
+export function dateAsNumber(date: Date,UTC=true): number {
+  return Number.parseInt(dateAsString(date,UTC))
 }
-export function dateAsString(date: Date): string {
+export function dateAsString(date: Date,UTC=true): string {
+  if(UTC)
   return date.getUTCFullYear().toString().concat((date.getUTCMonth()).toString().padStart(2, "0")).concat(date.getUTCDate().toString())
-}
+  else
+      return date.getFullYear().toString().concat((date.getMonth()).toString().padStart(2, "0")).concat(date.getDate().toString())
+  }
+
+
+

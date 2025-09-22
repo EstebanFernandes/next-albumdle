@@ -24,9 +24,6 @@ function assertNoError<T>(
   return result.data;
 }
 
-
-
-
 export async function retrieveTodayAlbum() {
 
   const todayString = todayDateNumber()
@@ -45,6 +42,14 @@ export async function retrieveAlbum(date: number) {
     .from("rolling_stones_magazine")
     .select().eq("date", date).range(0, 1)
 
+}
+
+export async function DBretrieveAlbumById(id:number) {
+  const res = await supabase
+    .from("rolling_stones_magazine")
+    .select().eq("id", id).range(0, 1)
+    const data = assertNoError(res, `Try to retrieve album with id ${id}`)
+    return data[0];
 }
 
 export async function updateTodayAlbum(): Promise<AlbumOfTheDay | null> {
@@ -126,4 +131,20 @@ export async function uploadToSupabase(fileName: string, buffer: Buffer) {
   // Return public URL
   return supabase.storage.from(BUCKET).getPublicUrl(fileName).data.publicUrl;
 
+}
+
+//Get each id for a given day of the month, input as format yyyymm
+export async function getMonthPick(yearmonth: number): Promise<
+  {
+    id: number;
+    date: number | null;
+  }[]> {
+    const min = Number.parseInt(yearmonth.toString().padEnd(8,"0"))
+        const max = (yearmonth+1).toString().padEnd(8,"0")
+  console.log(`Fetching rows for the following date ${yearmonth}`)
+  const res = await supabase.from("rolling_stones_magazine").select("id,date").lt('date', max).gt("date",min)
+  const data = assertNoError(res, `Fetching album of the day for the following year and month ${yearmonth}`)
+  //Cleaning data
+  console.log(`Returning ${data.length} rows`)
+  return data;
 }

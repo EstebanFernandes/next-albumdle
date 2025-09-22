@@ -1,11 +1,11 @@
 "use server";
 // This file should contain game's logic, as choosing the right album based on user input. and decide the album of the day
-import { Album } from "../types/albums";
+import { Album, nullAlbum } from "../types/albums";
 
 import crypto from 'crypto';
 import { AlbumOfTheDay } from "../types/game";
 import { createDefaultGameState, createFirstGameState, GameClientFirstInformation, GameClientLastUpdate, GameClientUpdate, GameState, hintState } from "../types/game-state";
-import { createDefaultMainStat, createDefaultStat, Stat } from "../types/stat";
+import { baseStat, createDefaultMainStat, createDefaultStat, Stat } from "../types/stat";
 import { updateAlbumInDatabase, updateTodayAlbum } from "../utils/supabase";
 import { getAlbums } from "./csv";
 import { todayDateString } from "./utils";
@@ -23,7 +23,7 @@ const partial: string = "bg-[#FFB900]"
 const GAME_SECRET = process.env.GAME_SECRET!;
 export async function checkTodayAlbum() {
   if (albumOfTheDay === null) {
-   albumOfTheDay = await updateTodayAlbum();
+    albumOfTheDay = await updateTodayAlbum();
     return albumOfTheDay
   }
   const todaydate = todayDateString()
@@ -44,9 +44,8 @@ export async function startGame() {
   return createFirstGameState(signState(state));
 }
 
-export async function getTodayAlbum()
-{
-  if(albumOfTheDay)
+export async function getTodayAlbum() {
+  if (albumOfTheDay)
     return albumOfTheDay;
   return await checkTodayAlbum()
 }
@@ -73,24 +72,22 @@ export async function submitGuess(
       knownStat: createDefaultStat(),
       isGameOver: true,
       dateToNextUpdate: new Date(Date.UTC(lastDate.getUTCFullYear(), lastDate.getUTCMonth(), lastDate.getUTCDate() + 1)),
-      try : 0,
-      guess : 0
+      try: 0,
+      guess: 0
     };
     return lastState;
   }
 
   // --- Validate the guess ---
-
-  const guess = albums[guessId];
   const album = albumOfTheDay.album
-  console.log(`Guess try ${guess.title} by ${guess.artist}`)
+  const guess = (guessId === -1) ? null : albums[guessId];
 
-  await updateState(state, guess);
+  updateState(state, guess);
   const isCorrect = state.attempts.some(a => a.id === album.id);
   console.log(`Status of the guess : ${isCorrect.toString()}`)
   if (state.isGameOver || isCorrect) {
     albumOfTheDay.try++
-    if(isCorrect) albumOfTheDay.guess++
+    if (isCorrect) albumOfTheDay.guess++
     updateAlbumInDatabase(albumOfTheDay)
     const lastState: GameClientLastUpdate = {
       type: 'last',
@@ -100,12 +97,13 @@ export async function submitGuess(
       knownStat: calculateNewStat(state),
       isGameOver: true,
       dateToNextUpdate: new Date(Date.UTC(lastDate.getUTCFullYear(), lastDate.getUTCMonth(), lastDate.getUTCDate() + 1)),
-      try : albumOfTheDay.try,
-      guess : albumOfTheDay.guess
+      try: albumOfTheDay.try,
+      guess: albumOfTheDay.guess
     };
     return lastState;
   }
-
+  console.log("here is the guess")
+  console.log(guess)
 
   const clientInfo: GameClientUpdate = {
     type: 'update',
@@ -118,13 +116,18 @@ export async function submitGuess(
   return clientInfo;
 }
 
-async function updateState(state: GameState, guess: Album) {
-  // Update the game state as needed
-  state.attempts.push(guess);
+function updateState(state: GameState, guess: Album | null) {
+  if (guess) {
+    updateColorOfAlbum(guess);
+    // Update the game state as needed
+    state.attempts.push(guess);
+  }
+  else {
+    state.attempts.push(nullAlbum())
+  }
   if (state.attempts.length >= state.maxAttempts) {
     state.isGameOver = true;
   }
-  updateColorOfAlbum(guess);
   updateHints(state.hints);
 }
 
@@ -146,12 +149,12 @@ function updateHints(hints: hintState[]) {
 
 function numericLogic(values: number[], aimValue: number, isReverse = false) {
   if (!Array.isArray(values) || values.length === 0) {
-    return 'Unknown';
+    return baseStat;
   }
 
   aimValue = Number(aimValue);
   if (isNaN(aimValue)) {
-    return 'Unknown';
+    return baseStat;
   }
   if (values.includes(aimValue)) {
 
@@ -276,23 +279,25 @@ function calculateNewStat(state: GameState): Stat {
   const returnStat = createDefaultMainStat()
   if (albumOfTheDay === null)
     return returnStat
+  const attempts = state.attempts.filter(attempt=> attempt.id!==-1)
   const album = albumOfTheDay.album;
   //ARTIST NAME LOGIC
-  const artists = [...new Set(state.attempts.map(a => a.artist).filter(Boolean))];
+  const artists = [...new Set(attempts.map(a => a.artist).filter(Boolean))];
   returnStat.artist = (artists.includes(album?.artist)) ? album?.artist : "???";
 
   // RANK LOGIC
-  const ranks = state.attempts.map(a => Number(a.rank)).filter(n => !isNaN(n));
+  const ranks = attempts.map(a => Number(a.rank)).filter(n => (!isNaN(n) || n !== -1));
 
   returnStat.rank = numericLogic(ranks, album?.rank)
 
   // RELEASE YEAR LOGIC
-  const releases = state.attempts.map(a => Number(a.releaseDate)).filter(n => !isNaN(n));
+  const releases = attempts.map(a => Number(a.releaseDate)).filter(n => !isNaN(n) || n !== -1);
+  console.log(releases)
   returnStat.date = numericLogic(releases, album?.releaseDate);
 
   const genres = Array.from(
     new Set(
-      state.attempts
+      attempts
         .map(a => a.genres)        // get the array of genres for each attempt
         .filter(Boolean)           // remove undefined or null
         .flat()                    // flatten array of arrays into a single array
@@ -306,20 +311,20 @@ function calculateNewStat(state: GameState): Stat {
 
 
   // TYPE LOGIC
-  const types = state.attempts.map(a => a.type).filter(Boolean);
+  const types = attempts.map(a => a.type).filter(Boolean);
   returnStat.type = types.includes(album?.type) ? album?.type : "???";
 
   // MEMBERS LOGIC
-  const members = state.attempts.map(a => a.memberCount).filter(Boolean);
+  const members = attempts.map(a => a.memberCount).filter(Boolean);
   returnStat.memberCount = memberLogic(members, album?.memberCount);
 
   // LOCATION LOGIC
-  const locations = state.attempts.map(a => a.country).filter(Boolean);
+  const locations = attempts.map(a => a.country).filter(Boolean);
   returnStat.location = (locations.includes(album?.country)) ? album?.country : "???";
 
 
   // LABEL LOGIC
-  const labels = state.attempts.map(a => a.label).filter(Boolean);
+  const labels = attempts.map(a => a.label).filter(Boolean);
   returnStat.label = labels.includes(album?.label) ? album?.label : "???";
   return returnStat;
 }

@@ -1,56 +1,72 @@
 {
-  "HomePage": {
+  "homePage": {
     "title": "Your guessing game about music albums",
     "subtitle": "Try to guess today's random album from the Rolling Stones' best 500 albums of all time",
     "button": "Right here"
   },
-  "gamePage":{
+  "gamePage": {
     "title": "Guess today's album",
     "subtitle": "To play, simply enter an album title in the field below and click \"Guess.\"",
     "input": "Search for an album or artist",
-    
     "attemptsLeft": "Attempts left",
     "attemptsList": "Attempts list",
     "currentInformation": {
       "title": "Current information",
-      "artist" : "Artist",
-      "hints" : "Hints :",
+      "artist": "Artist",
+      "hints": "Hints :",
       "hintAvailable": "Hint available in ",
-      "songs" : "Popular tracks",
+      "songs": "Popular tracks",
       "cover": "Cover",
       "tooltips": {
-        "rank" : "Ranking of the album",
-        "year" : "Release year",
-        "albumType" : "Album type: Studio, Compilation, Live...",
-        "genre" : "Album genre(s)",
-        "memberCount":"Number of members",
-        "location":"Recording location",
-        "label" : "Label that produced the album"
+        "rank": "Ranking of the album",
+        "year": "Release year",
+        "albumType": "Album type: Studio, Compilation, Live...",
+        "genre": "Album genre(s)",
+        "memberCount": "Number of members",
+        "location": "Recording location",
+        "label": "Label that produced the album"
       }
     },
-    "gameOver":{
+    "gameOver": {
       "title": "The album was",
-       "comeOver": "Next album in : ",
-       "win": {
-         "title": "Congratulations!",
-         "message": "You guessed the album!"
-       },
-       "lose": {
-         "title": "Loser!",
-         "message": "You didn't guess the album."
-       }
+      "comeOver": "Next album in : ",
+      "win": {
+        "title": "Congratulations!",
+        "message": "You guessed the album!"
+      },
+      "lose": {
+        "title": "Loser!",
+        "message": "You didn't guess the album."
+      }
+    },
+    "subtitle2": "Use information from each attempts and hints to find the right album"
+  },
+  "adminPage": {
+    "title": "Admin dashboard",
+    "todayAlbum": "Today's album",
+    "try": "Number of attempts",
+    "guess": "Number of people who found",
+    "login": {
+      "title": "Admin login",
+      "placeholder": "Enter admin password",
+      "button": "Login",
+      "error": "Wrong password",
+      "errorWeird": "Unexpected error, please try again"
     }
   },
-	"adminPage":{
-		"title" : "Admin dashboard",
-		"todayAlbum" :"Today's album",
-		"try":"Number of attempts",
-		"guess" : "Number of guess"
-	},
-  "tools":{
+  "tools": {
     "autoComplete": {
       "placeholder": "Search for an album or artist",
-      "button": "Submit Guess"
-    }
+      "button": "Submit Guess",
+      "tooltipSkip": "Click here to skip this attempts"
+    },
+    "calendar": {
+      "title": "Select a date"
+    },
+    "albumDisplay": {
+      "albumMissing": "Attempts skip"
+    },
+    "attempts": "attempts",
+    "available": "Available in"
   }
 }

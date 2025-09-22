@@ -5,6 +5,8 @@ import { Card } from "./ui/card"
 import { Input } from "./ui/input"
 import { Button } from "./ui/button"
 import { useTranslations } from "next-intl"
+import { StepForward } from "lucide-react"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip"
 
 export default function AutoComplete({
   fullList,
@@ -30,8 +32,8 @@ export default function AutoComplete({
 
     if (value.trim().length > 0) {
       const newList = fullList
-        .filter((item) => String(item.labelImportant+" "+item.labelSecondary).toLowerCase().includes(value.toLowerCase()))
-        .slice(0, 7)  
+        .filter((item) => String(item.labelImportant + " " + item.labelSecondary).toLowerCase().includes(value.toLowerCase()))
+        .slice(0, 7)
       setFilteredList(newList)
       setOpen(newList.length > 0)
     } else {
@@ -49,6 +51,9 @@ export default function AutoComplete({
     }
   }
 
+  function passPressed() {
+    onEnter("")
+  }
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (!open) return
 
@@ -73,7 +78,7 @@ export default function AutoComplete({
   }
 
   function selectItem(item: { value: string; labelImportant: string; labelSecondary: string }) {
-    setInputValue(item.labelImportant+" - "+item.labelSecondary)
+    setInputValue(item.labelImportant + " - " + item.labelSecondary)
     setOpen(false)
     setActiveIndex(-1)
     onEnter(item.value) // <-- also notify parent when selecting an item
@@ -84,32 +89,45 @@ export default function AutoComplete({
     <div className="relative w-[250px] sm:w-[300px] md:w-[400px] lg:w-[500px]">
       <div className="w-full h-full flex flex-col justify-center items-center gap-2">
         <div className="w-full h-full flex flex-col justify-center items-center ">
-        <Input
-          ref={inputRef}
-          placeholder={t("placeholder")}
-          value={inputValue}
-          onChange={(e) => handleChanges(e.target.value)}
-          onKeyDown={handleKeyDown}
-        />
-        {open && (
-          <Card className="absolute top-full -mt-2 w-full  rounded-lg border shadow-md z-50 py-0" >
-            <ul className="max-h-60 overflow-auto p-2">
-              {filteredList.map((item, index) => (
-                <li
-                  key={item.value}
-                  className={`cursor-pointer p-1 rounded-md ${
-                    index === activeIndex ? "bg-gray-100 dark:bg-gray-800" : ""
-                  }`}
-                  onMouseDown={() => selectItem(item)}
-                >
-                  <b>{item.labelImportant}</b> - <span className="text-gray-500">{item.labelSecondary}</span>
-                </li>
-              ))}
-            </ul>
-          </Card>
-        )}
+          <Input
+            ref={inputRef}
+            placeholder={t("placeholder")}
+            value={inputValue}
+            onChange={(e) => handleChanges(e.target.value)}
+            onKeyDown={handleKeyDown}
+          />
+          {open && (
+            <Card className="absolute top-full -mt-2 w-full  rounded-lg border shadow-md z-50 py-0" >
+              <ul className="max-h-60 overflow-auto p-2">
+                {filteredList.map((item, index) => (
+                  <li
+                    key={item.value}
+                    className={`cursor-pointer p-1 rounded-md ${index === activeIndex ? "bg-gray-100 dark:bg-gray-800" : ""
+                      }`}
+                    onMouseDown={() => selectItem(item)}
+                  >
+                    <b>{item.labelImportant}</b> - <span className="text-gray-500">{item.labelSecondary}</span>
+                  </li>
+                ))}
+              </ul>
+            </Card>
+          )}
         </div>
-      <Button onClick={enterPressed}>{t("button")}</Button></div>
+        <div className=" flex flex-row gap-1">
+          <Button onClick={enterPressed}>{t("button")}</Button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="secondary" size="icon" onClick={passPressed}><StepForward />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p> {t("tooltipSkip")} </p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
+      </div>
     </div>
   )
 }

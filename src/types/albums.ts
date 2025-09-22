@@ -18,6 +18,29 @@ export interface Album {
 }
 
 
+export function nullAlbum() : Album
+{
+  
+return {
+  id: -1,
+  title: "",
+  rank: -1,
+  type: "",
+  memberCount: -1,
+  country: "",
+  label:  "",
+  small_thumbnail: "",
+  large_thumbnail: "",
+  genres: [],
+  top_songs: [],
+  artist: "",
+  releaseDate: -1,
+  color: createDefaultStat()
+}
+}
+
+
+
 export function createStat(album: Album): Stat {
   return {
     artist: album.artist,
