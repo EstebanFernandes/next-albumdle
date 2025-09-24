@@ -120,10 +120,10 @@ function updateState(state: GameState, guess: Album | null) {
   if (guess) {
     updateColorOfAlbum(guess);
     // Update the game state as needed
-    state.attempts.push(guess);
+    state.attempts.unshift(guess);
   }
   else {
-    state.attempts.push(nullAlbum())
+    state.attempts.unshift(nullAlbum())
   }
   if (state.attempts.length >= state.maxAttempts) {
     state.isGameOver = true;

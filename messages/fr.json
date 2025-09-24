@@ -38,7 +38,9 @@
       "lose": {
         "title": "Gros naze !",
         "message": "Vous n'avez pas deviné l'album."
-      }
+      },
+      "subtitle": "Album du jour",
+      "todayPerc": "Pourcentage de réussite pour cet album "
     }
   },
   "adminPage": {

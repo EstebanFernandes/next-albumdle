@@ -17,6 +17,12 @@ export interface Album {
   color: Stat;
 }
 
+export interface BackgroundAlbum{
+  id:number;
+  title:string;
+  thumbnail:string;
+  scale:number;
+}
 
 export function nullAlbum() : Album
 {

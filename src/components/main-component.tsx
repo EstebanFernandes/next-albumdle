@@ -10,6 +10,8 @@ import AutoComplete from "./autocomplete";
 import StatMainDisplay from "./display-stat";
 import { Separator } from "./ui/separator";
 import { Card, CardContent, CardHeader } from "./ui/card";
+import Confetti, { ConfettiHandle } from "./confetti";
+import { Button } from "./ui/button";
 
 
 
@@ -26,17 +28,19 @@ export function MainComponent({ albums }: { albums: Album[] }) {
   const attemptListRef = useRef<HTMLDivElement>(null);
   const [fullAutoCompleteList, setFullAutoCompleteList] = useState<{ value: string; labelImportant: string; labelSecondary: string }[]>([]);
   const [difference, setDifference] = useState<Date>(new Date());
-
-  const correct: string = "bg-[#61B35B]"
   const incorrect: string = "bg-[#D83B3B]"
   const neutral: string = "bg-gray-500"
+  const correct: string = "bg-[#61B35B]"
   const skip: string = "bg-[#664F3E]"
   const beginTransition = `transition-opacity duration-500 ${isFirstAttempt ? "opacity-0" : "opacity-100"}
   ${isFirstAttempt ? "pointer-events-none" : ""}`
-
-
+  const [disabledInput, setDisableInput] = useState<boolean>(false)
+  const confettiRef = useRef<ConfettiHandle>(null);
 
   const t = useTranslations("gamePage");
+  const [title, setTitle] = useState<string>(t("title"))
+  const [subtitle, setSubtitle] = useState<string>(t("subtitle"))
+
   async function startGameClientSide() {
     setFullAutoCompleteList(albums.map((album) => ({
       value: album.id.toString(),
@@ -71,6 +75,8 @@ export function MainComponent({ albums }: { albums: Album[] }) {
     setDisplayInfo(gameUpdate.knownStat);
     switch (gameUpdate.type) {
       case 'update':
+        if (newGameState.attempts.length !== 0)
+          setSubtitle(t("subtitle2"))
         if (gameUpdate.attemptVerify === undefined)
           attemptsSquare[newGameState.attempts.length as number - 1] = skip;
         else
@@ -81,10 +87,15 @@ export function MainComponent({ albums }: { albums: Album[] }) {
         break;
       case 'last':
         // Handle last case
-        if (gameUpdate.hasWin)
+        if (gameUpdate.hasWin) {
           attemptsSquare[newGameState.attempts.length as number - 1] = correct;
+          fireConfetti()
+        }
         else
           attemptsSquare[newGameState.attempts.length as number - 1] = incorrect;
+        setTitle(gameUpdate.hasWin ? t("gameOver.win.title") : t("gameOver.lose.title"))
+        setSubtitle(gameUpdate.hasWin ? t("gameOver.win.message") : t("gameOver.lose.message"));
+        setDisableInput(true)
         setClientLastUpdate(gameUpdate);
         break;
     }
@@ -122,25 +133,42 @@ export function MainComponent({ albums }: { albums: Album[] }) {
   }
 
 
-  function displayLastDialog(ClientLastUpdate: GameClientLastUpdate | null) {
-    if (!ClientLastUpdate) return;
-    const hasWin = ClientLastUpdate.hasWin;
-    const album = ClientLastUpdate.answer;
-    const title = hasWin ? t("gameOver.win.title") : t("gameOver.lose.title");
-    const message = hasWin ? t("gameOver.win.message") : t("gameOver.lose.message");
+  function displayLastDialog(clientLastUpdate: GameClientLastUpdate | null) {
+    if (!clientLastUpdate) return;
+    const hasWin = clientLastUpdate.hasWin;
+    const album = clientLastUpdate.answer;
+    const perc = Math.round(clientLastUpdate.guess / clientLastUpdate.try * 100);
     album.color = createDefaultStat()
+    const songs = clientLastUpdate.answer.top_songs;
     return (
-      <div className="flex flex-col justify-center items-center gap-2">
-        <p className="text-2xl">{title}</p>
-        <p className="text-xl">{message}</p>
-        <AlbumDisplay album={album} />
-        <p>{t("gameOver.comeOver")} {`${difference.getHours()}:${difference.getMinutes()}:${difference.getSeconds()}`}</p>
-      </div>
+      <Card className="w-full">
+        <CardHeader><span className={`sm:text-2xl text-2xl `}>{t("gameOver.subtitle")}</span></CardHeader>
+        <CardContent>
+          <div className="flex flex-col justify-center items-start gap-2">
+            <div className="flex flex-row items-start">
+              <AlbumDisplay album={album} />
+              <div className="w-3/10 flex flex-col items-start">
+                  <span className="font-weight text-lg"> {t("currentInformation.songs")} </span>
+                <ul>
+                  {songs.map((song) =>
+                    (<li key={song} className="font-weight text-sm">{song}</li>))}
+                </ul>
+              </div>
+            </div>
+            <span>{t("gameOver.comeOver")} {`${difference.getHours()}:${difference.getMinutes()}:${difference.getSeconds()}`}</span>
+            <span> {t("gameOver.todayPerc")}&nbsp;:&nbsp;{perc}&nbsp;% </span>
+
+          </div>
+        </CardContent>
+      </Card>
+
+
     );
   }
 
   function displayCurrentInformation(knownStat: Stat) {
     return (
+
       <Card className="w-full">
         <CardHeader><span className={` ${beginTransition} sm:text-2xl text-2xl `}>{t("currentInformation.title")}</span></CardHeader>
         <CardContent>
@@ -154,15 +182,9 @@ export function MainComponent({ albums }: { albums: Album[] }) {
   }
 
 
+  function displayCurrentHeadInfo() {
+    return (
 
-
-  return (
-    <div className=" w-[100vw] lg:w-[50vw] md:w-[50vw] sm:w-[70vw] h-full text-xs sm:text-sm md:text-lg
-    px-2">
-      <div className="flex flex-col justify-center items-center gap-2 mt-5">
-        <div className=" text-xl sm:text-2xl md:text-3xl">{t("title")} </div>
-        <div className="text-md sm:text-lg md:text-xl">{gameState && gameState?.attempts.length !== 0 ? t("subtitle2") : t("subtitle")}</div>
-      </div>
       <div className={`w-full h-full flex flex-col justify-center items-center gap-2 mt-2
                   ${beginTransition}`}>
         <div className={`flex flex-row gap-2 mt-2`}>
@@ -176,8 +198,36 @@ export function MainComponent({ albums }: { albums: Album[] }) {
         </div>
         {t("attemptsLeft")}: {gameState && gameState.maxAttempts! - gameState.attempts.length!}
       </div>
+    );
+  }
+
+  async function fireConfetti() {
+    const launches: { x: number, y: number, offset: number }[] = []
+    for (let i = 0; i < 20; i++) {
+      launches.push({
+        x: Math.random() * innerWidth,
+        y: Math.random() * innerHeight,
+        offset: Math.random() * 200
+      })
+    }
+
+    for (const launch of launches) {
+      confettiRef.current?.fire(launch.x, launch.y)
+      await new Promise(r => setTimeout(r,));
+    }
+  }
+
+
+  return (
+    <div className=" w-[100vw] lg:w-[50vw] md:w-[50vw] sm:w-[70vw] h-full text-xs sm:text-sm md:text-lg
+    px-2">
+      <div className="flex flex-col justify-center items-center gap-2 mt-5">
+        <div className=" text-xl sm:text-2xl md:text-3xl">{title} </div>
+        <div className="text-md sm:text-lg md:text-xl">{subtitle}</div>
+      </div>
+      {clientLastUpdate === null && displayCurrentHeadInfo()}
       <div className="flex flex-col justify-center items-center gap-4 mt-6">
-        <AutoComplete fullList={fullAutoCompleteList} onEnter={handleEnter} />
+        <AutoComplete fullList={fullAutoCompleteList} onEnter={handleEnter} disabled={disabledInput} />
         <div className={`flex flex-col justify-center items-center gap-4 w-full
               ${beginTransition}`}>
           {clientLastUpdate === null && displayCurrentInformation(displayInfo)}
@@ -199,6 +249,7 @@ export function MainComponent({ albums }: { albums: Album[] }) {
           </div>
         </div>
       </div>
+      <Confetti ref={confettiRef} count={50}  />
     </div>
   );
   function storeSecure(secure: { data: string, signature: string }) {

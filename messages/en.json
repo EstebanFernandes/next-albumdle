@@ -37,7 +37,9 @@
       "lose": {
         "title": "Loser!",
         "message": "You didn't guess the album."
-      }
+      },
+      "subtitle": "Album of the day",
+      "todayPerc": "Percentage of success for this album"
     },
     "subtitle2": "Use information from each attempts and hints to find the right album"
   },

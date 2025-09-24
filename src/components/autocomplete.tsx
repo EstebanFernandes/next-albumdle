@@ -11,9 +11,11 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/t
 export default function AutoComplete({
   fullList,
   onEnter,
+  disabled
 }: {
   fullList: { value: string; labelImportant: string; labelSecondary: string }[]
-  onEnter: (value: string) => void
+  onEnter: (value: string) => void,
+  disabled:boolean
 }) {
   const [filteredList, setFilteredList] = useState<{ value: string; labelImportant: string; labelSecondary: string }[]>([])
   const [inputValue, setInputValue] = useState("")
@@ -85,6 +87,9 @@ export default function AutoComplete({
     setInputValue("")
   }
 
+  if(disabled)
+    return null
+  
   return (
     <div className="relative w-[250px] sm:w-[300px] md:w-[400px] lg:w-[500px]">
       <div className="w-full h-full flex flex-col justify-center items-center gap-2">
@@ -95,6 +100,7 @@ export default function AutoComplete({
             value={inputValue}
             onChange={(e) => handleChanges(e.target.value)}
             onKeyDown={handleKeyDown}
+            disabled= {disabled}
           />
           {open && (
             <Card className="absolute top-full -mt-2 w-full  rounded-lg border shadow-md z-50 py-0" >
@@ -114,11 +120,11 @@ export default function AutoComplete({
           )}
         </div>
         <div className=" flex flex-row gap-1">
-          <Button onClick={enterPressed}>{t("button")}</Button>
+          <Button onClick={enterPressed} disabled={disabled}>{t("button")}</Button>
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="secondary" size="icon" onClick={passPressed}><StepForward />
+                <Button variant="secondary" size="icon" onClick={passPressed} disabled= {disabled}><StepForward />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>

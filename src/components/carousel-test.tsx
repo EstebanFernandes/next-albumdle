@@ -1,45 +1,63 @@
-"use client"; 
+"use client";
 import Image from "next/image";
-import { Album } from "../types/albums";
+import { Album, BackgroundAlbum } from "../types/albums";
 import { Carousel, CarouselContent, CarouselItem } from "./ui/carousel";
 
 type CarouselWrapperProps = {
-	albums: Album[]
-	carouselDirection: "forward" | "backward"
-	className?: string
+    albums: BackgroundAlbum[]
+    direction: "forward" | "backward"
+    className?: string,
+    speed?: number // default: 20s
 }
-
 //The background will randomly load 40 albums and make 2 carousels that display 20 albums each
-export function CarouselWrapper({ albums, carouselDirection,className="" }: CarouselWrapperProps) {
+export function CarouselTestWrapper({ albums, direction, className = "", speed = 20 }: CarouselWrapperProps) {
 
-	return (
-   <Carousel
-    opts={{
-        align: "start",
-        loop: true,
-  
-  
-    }}
-    orientation="vertical"
-    plugins={[/*
-        AutoScroll({
-            direction: carouselDirection,  // Use direction instead of speed
-            speed: 0.5,                    // Adjust speed as needed (slower = smoother)
-            playOnInit: true,
-            stopOnInteraction: false,
-        }),
-    */]}
-    className={`w-[35px] sm:w-[70px] lg:w-[120px] h-full z-200 ${className}`}
->
-	<CarouselContent >
-		{albums.map((album) => (
-			<CarouselItem key={album.id} className="relative group  py-10 sm:py-5 md:py-4 lg:py-3" >
-				<Image src={album.small_thumbnail} alt={album.title} width={100} height={100}
-					className="rounded-sm sm:rounded-md w-full h-full object-cover aspect-square" />
-			</CarouselItem>
-		))}
-	</CarouselContent>
-		</Carousel>
+    const entireClassName = `w-[35px] sm:w-[70px] lg:w-[120px] h-full z-200 relative h-[500px] overflow-hidden ${className}`
 
-	);
+     const doubledAlbums = [...albums,...albums]
+    return (
+        <>
+            <style jsx>{`
+        @keyframes scroll {
+          0% {
+            transform: translateY(0);
+          }
+          100% {
+            transform: translateY(-50%);
+          }
+        }
+        @keyframes scroll-reverse {
+          0% {
+            transform: translateY(-50%);
+          }
+          100% {
+            transform: translateY(0);
+          }
+        }
+        .animate-scroll {
+          animation: scroll 30s linear infinite;
+        }
+        .animate-scroll-reverse {
+          animation: scroll-reverse 30s linear infinite;
+        }
+      `}</style>
+
+            <div className={entireClassName}>
+                <div className={`flex flex-col ${direction === "forward" ? "animate-scroll-reverse" : "animate-scroll"}`}>
+                    {doubledAlbums.map((album, idx) => (
+                        <div key={`${album.id}-${idx}`} className="relative group py-3">
+                            <Image
+                                src={album.thumbnail}
+                                alt={album.title}
+                                width={120}
+                                height={120}
+                                style={{ transform: `scale(${album.scale / 100})` }}
+                                className={`rounded-md w-[120px] h-[120px] object-cover aspect-square `}
+                            />
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </>
+    )
 }
