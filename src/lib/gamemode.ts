@@ -9,6 +9,7 @@ import { getRandomElements, todayDateString } from "./utils";
 const gamemodes: GameDayData[] = [];
  export async function initGamemodes()
 {
+  console.log("initializing Game data")
     if(gamemodes.length!==0)
         return false;
     const data = await getGameModes() //From DB
@@ -30,7 +31,7 @@ const gamemodes: GameDayData[] = [];
         gamemodes.push({mode :gamemode, today : null})
         for(const gameDay of gamemodes)//Init for each gamemode today album
         {
-          updateDayData(gameDay)
+          await updateDayData(gameDay)
         }
         console.log(`Found gamemode  ${gamemode.title} with id ${gamemode.id}`)
     }
@@ -67,6 +68,7 @@ export async function updateDayData(gId:number)
 
 export async function updateDayData(dayData:GameDayData)
 {
+  console.log(`Updating game data for ${dayData.mode.title}`)
     if(dayData.today===null)
        { dayData.today = await updateTodayAlbum(dayData.mode.id)
     return dayData.today;

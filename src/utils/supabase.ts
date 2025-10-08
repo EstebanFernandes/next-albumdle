@@ -149,7 +149,7 @@ export async function updateTodayAlbum(gID:number): Promise<todayData | null> {
     
     if (todayTry.album_id) {
       const todayAlbum = albums[todayTry.album_id]
-      console.log(`Album of the day is ${todayAlbum.title} by ${todayAlbum.artist}`)
+      console.log(`Album of the day is ${todayAlbum.title} by ${todayAlbum.artist} for gamedata ${gID}`)
       return {
         id: todayTry.id.toString(),
         date: todaydate.toString(),
