@@ -1,11 +1,9 @@
 import fs from "fs";
-import path from "path";
 import Papa from 'papaparse';
+import path from "path";
 import { Album } from "../types/albums";
-import { getRandomElements } from "./utils";
 import { createDefaultStat } from "../types/stat";
-import { RawAlbumRow } from "../types/csv.types";
-import { getPropertiesFromHeader } from "./property";
+
 
 
 

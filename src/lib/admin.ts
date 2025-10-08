@@ -29,13 +29,13 @@ export async function handleLogout() {
 
 
 //Get each id for a given day of the month, input as format yyyymm
-export async function getMonthDate(yearmonth: number): Promise<
+export async function getMonthDate(yearmonth: number,gID:number): Promise<
   {
     id: number;
     date: number | null;
   }[]>
   {
-    return getMonthPick(yearmonth);
+    return getMonthPick(yearmonth,gID);
 }
 
 export async function retrieveAlbumById(id:number) {

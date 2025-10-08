@@ -26,12 +26,12 @@ export default function AdminComponent({ albums }: { albums: Album[] }) {
 
     async function initFunction() {
 
-        const albumOfTheDay = await getTodayAlbum()
+        //const albumOfTheDay = await getTodayAlbum()
         setAlbumOfTheDay(albumOfTheDay)
         if (albumOfTheDay)
             setAlbum(albumOfTheDay?.album)
         const todaydate = todayDateString()
-        const monthPicks = await getMonthDate(Number.parseInt(todaydate.substring(0, 6)))
+        const monthPicks = await getMonthDate(Number.parseInt(todaydate.substring(0, 6)),1)
         console.log(monthPicks)
         setMonthDate(monthPicks)
     }
