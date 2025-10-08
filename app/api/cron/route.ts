@@ -1,4 +1,4 @@
-import { checkTodayAlbum } from '@/src/lib/logic';
+import {  updateAlbums } from '@/src/lib/gamemode';
 import type { NextRequest } from 'next/server';
  
 export async function GET(request: NextRequest) {
@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
     });
   }
  
-  // Update album of the day
-  await checkTodayAlbum()
+  // Update album of the day for each gamemode 
+  await updateAlbums()
   return Response.json({ success: true });
 }

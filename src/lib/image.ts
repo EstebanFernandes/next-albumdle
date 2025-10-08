@@ -1,3 +1,4 @@
+"use server";
 import crypto from "crypto";
 import sharp from "sharp";
 import { uploadToSupabase } from "../utils/supabase";

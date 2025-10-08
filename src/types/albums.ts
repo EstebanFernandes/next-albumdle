@@ -1,3 +1,4 @@
+import { AlbumOfTheDay } from "./game";
 import { createDefaultStat, Stat } from "./stat";
 
 export interface Album {
@@ -8,20 +9,47 @@ export interface Album {
   memberCount: number;
   country: string;
   label: string;
-  small_thumbnail: string;
-  large_thumbnail: string;
+  smallThumbnail: string;
+  largeThumbnail: string;
   genres: string[];
-  top_songs: string[];
+  topSongs: string[];
   artist: string;
   releaseDate: number;
   color: Stat;
 }
 
-export interface BackgroundAlbum{
-  id:number;
-  title:string;
-  thumbnail:string;
-  scale:number;
+/**
+ * This interface can describe a gamemode, the album type is define from the header of this gamemode
+ */
+export interface GameMode {
+  id: number;
+  title: string;
+  description: string;
+  url: string;
+  propertiesString: string[];     // the schema
+  data: Album[];  // rows with that schema
+}
+
+export interface GameDayData {
+  mode: GameMode;     // the schema
+  today: todayData | null
+}
+
+export interface todayData {
+id:string;
+date: string;
+album: Album;
+imageHint:string|null;
+try:number;
+guess:number;
+}
+
+
+export interface BackgroundAlbum {
+  id: number;
+  title: string;
+  thumbnail: string;
+  scale: number;
 }
 
 export function nullAlbum() : Album
@@ -35,10 +63,10 @@ return {
   memberCount: -1,
   country: "",
   label:  "",
-  small_thumbnail: "",
-  large_thumbnail: "",
+  smallThumbnail: "",
+  largeThumbnail: "",
   genres: [],
-  top_songs: [],
+  topSongs: [],
   artist: "",
   releaseDate: -1,
   color: createDefaultStat()

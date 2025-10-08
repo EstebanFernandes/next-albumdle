@@ -1,8 +1,9 @@
 import AdminComponent from "@/src/components/admin";
-import { getAlbums } from "@/src/lib/csv";
+import { getAlbums } from "@/src/lib/gamemode";
 
-export default function Page() {
+export  default async function Page() {
+  const albums = await getAlbums(1) ?? []
   return (
-      <AdminComponent albums={getAlbums()}></AdminComponent>
+      <AdminComponent albums={albums}></AdminComponent>
   );
 }

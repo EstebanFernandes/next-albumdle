@@ -3,7 +3,7 @@ import { AlbumDisplay } from "@/src/components/album-display";
 import Calendar22 from "@/src/components/calendar-22";
 //import { getAlbums } from "@/src/lib/csv";
 //import { getMonthDate } from "@/src/lib/admin";
-import { getTodayAlbum } from "@/src/lib/logic";
+import {  } from "@/src/lib/gamemode";
 import { dateAsNumber, dateAsString, todayDateString } from "@/src/lib/utils";
 import { Album } from "@/src/types/albums";
 import { AlbumOfTheDay, createAlbumOfTheDay } from "@/src/types/game";

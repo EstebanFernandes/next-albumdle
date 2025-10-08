@@ -5,45 +5,87 @@ import { Album } from "../types/albums";
 import { getRandomElements } from "./utils";
 import { createDefaultStat } from "../types/stat";
 import { RawAlbumRow } from "../types/csv.types";
+import { getPropertiesFromHeader } from "./property";
 
-// Global cache to avoid reparsing the CSV each time
-let cachedAlbums: Album[]  = [];
-let hasBeenCalled = false;
-export function getAlbums(numberOfAlbums?: number): Album[] {
-  if (!hasBeenCalled) {
-    hasBeenCalled = true;
-    console.log("This has never been called, the CSV will be read out")
-    const csvPath = path.join(process.cwd(), "data", "albums.csv");
-    const csvFile = fs.readFileSync(csvPath, "utf8");
-    const result = Papa.parse<RawAlbumRow>(csvFile, { header: true }).data;
-    let i = 0;
-     // Cast to Album[]
-    cachedAlbums = result.map((row: RawAlbumRow) => ({
-      id: i++,          // convert string -> number
-      title: row.album,
-      rank: parseInt(row.rank_2020),
-      type : row.type,
-      memberCount: parseInt(row.artist_member_count),
-      country: row.country,
-      label: row.label_name,
-      small_thumbnail: row.small_thumbnails,
-      large_thumbnail: row.large_thumbnails,
-      genres: row.genres ? row.genres.split(";") : [],
-      top_songs: row.top_songs ? row.top_songs.split(";") : [],
-      artist: row.clean_name || undefined,
-      releaseDate: parseInt(row.release_year) || undefined,
-      color : createDefaultStat()
-    })) as Album[];
-  console.log(`Cached ${cachedAlbums.length} albums `);
-  }
 
-  if (numberOfAlbums) {
-    return getRandomElements(cachedAlbums, numberOfAlbums);
-  }
 
-  return cachedAlbums;
+export function getAlbumsRawData(csvData: string, header: string) {
+  const keys = header.split(","); // <-- string[], pas const
 
+  type Row = Record<string, string>; // générique, pas précis
+
+  // Papa Parse
+  const parsed = Papa.parse<string[]>(csvData, {
+    header: false,
+    skipEmptyLines: true,
+  });
+
+  const csvHeader = (parsed.data[0] as string[]) || [];
+  const csvHeaderIndex: Record<string, number> = {};
+  csvHeader.forEach((col, i) => (csvHeaderIndex[col] = i));
+
+  const rows: Row[] = (parsed.data.slice(1) as string[][]).map((line) => {
+    const obj: Row = {};
+    keys.forEach((key) => {
+      const idx = csvHeaderIndex[key];
+      obj[key] = idx !== undefined ? line[idx] ?? "" : "";
+    });
+    return obj;
+  });
+
+  return rows;
+}
+
+export function getAlbumsDataDynamic(csvData: string): Album[] {
+  const raw = Papa.parse<Record<string, string>>(csvData, {
+    header: true,
+    skipEmptyLines: true,
+  }).data;
+
+  let i = 0;
+
+  return raw.map((row) => {
+    const album: Partial<Album> = { id: i++, color: createDefaultStat() };
+
+    // Pour chaque clé de Album
+    (Object.keys(row) as (keyof Album)[]).forEach((key) => {
+      if (key in album || (key === "id")) return; // id déjà défini
+      
+      if ( key === "color") return; // Color déjà défini
+      const value = row[key];
+      if (value == null) return;
+
+      switch (key) {
+        case "rank":
+        case "memberCount":
+        case "releaseDate":
+          album[key] = parseInt(value) as number;
+          break;
+
+        case "genres":
+        case "topSongs":
+          album[key] = value.split(";") as string[];
+          break;
+
+        default:
+          album[key] = value as string;
+      }
+    });
+
+    return album as Album;
+  });
 }
 
 
 
+
+
+
+// Header is generic, we want TS to know the keys
+export function getAlbum(
+  csvUrl: string,
+): Album[] {
+  const url = path.join(process.cwd(), "data", csvUrl);
+  const csvData = fs.readFileSync(url, "utf8");
+  return getAlbumsDataDynamic(csvData)
+}

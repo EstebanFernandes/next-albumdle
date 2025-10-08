@@ -33,7 +33,7 @@
       "comeOver": "Revenez pour un nouvel album dans : ",
       "win": {
         "title": "Félicitations !",
-        "message": "Vous avez deviné l'album !"
+        "message": "Vous avez deviné l'album du jour en "
       },
       "lose": {
         "title": "Gros naze !",
@@ -70,5 +70,8 @@
     "albumDisplay": {
       "albumMissing": "Tentative d'album passée"
     }
+  },
+  "footer": {
+    "title": "Application créee par"
   }
 }

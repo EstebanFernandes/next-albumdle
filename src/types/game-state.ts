@@ -2,7 +2,7 @@ import * as Icons from "lucide-react";
 import { Album } from "./albums";
 import { createDefaultMainStat, Stat } from "./stat";
 export interface GameState {
-  gameType: GameType;
+  gamemodeId: number;
   attempts: Album[];
   isGameOver: boolean;
   maxAttempts: number;
@@ -57,17 +57,13 @@ return {
 }
 }
 
-export function createDefaultGameState() : GameState
+export function createDefaultGameState(gamemodeId:number) : GameState
 {
   return {
-    gameType: GameType.Main,
+    gamemodeId: gamemodeId,
     attempts: [],
     isGameOver: false,
     maxAttempts: 6,
     hints : []
   };
-}
-
-enum GameType {
-  Main = 0,
 }

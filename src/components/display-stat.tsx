@@ -8,10 +8,10 @@ import { memberCountToString } from "../lib/front.help"
 import { useTranslations } from "next-intl"
 import Image from "next/image"
 import { hintState } from "../types/game-state"
-import { useEffect } from "react"
+import { useEffect, useRef, useState } from "react"
 import * as Icons from "lucide-react";
 import { Button } from "./ui/button"
-import { Dialog,DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog"
 
 export default function StatMainDisplay({
   stat, hints
@@ -19,7 +19,6 @@ export default function StatMainDisplay({
   stat: Stat,
   hints: hintState[] | undefined
 }) {
-
 
   function numericStat(value: string) {
     if (value.includes("↓")) {
@@ -36,12 +35,11 @@ export default function StatMainDisplay({
     }
     else return (<>{value}</>);
   }
-
-
-
+  
+  
   interface AlbumItemProps {
     Icon: LucideIcon;
-    text: React.ReactNode;
+    text: string;
     toolTipText: string;
 
   }
@@ -56,28 +54,91 @@ export default function StatMainDisplay({
   useEffect(() => {
     console.log("Icon is", hints);
   }, [hints]);
+
   const t = useTranslations("gamePage.currentInformation");
   const tTools = useTranslations("tools");
   const animationReveal = "animate-ping"
   //Function use to factorize the album item display
-  const AlbumItem: React.FC<AlbumItemProps> = ({ Icon, text, toolTipText }) => {
-    useEffect(() => {
 
-    }, [text])
-    return (
-      <Tooltip >
-        <TooltipTrigger className={`flex items-center justify-center rounded-md sm:gap-2`}>
+  const baseStat = "???";
+
+const AlbumItem: React.FC<AlbumItemProps> = ({ Icon, text, toolTipText }) => {
+  const [animate, setAnimate] = useState(false);
+  const prevText = useRef<string | null>(null);
+
+    function numericStat(value: string) {
+    if (value.includes("↓")) {
+      const baseValue = Number(value.replace(/[↓↑]/, '').trim());
+      if (!isNaN(baseValue)) {
+        return (<span className="flex flex-row items-center">{baseValue} <ArrowDown className="h-4 sm:h-6 lg:h-7" /></span>);
+      }
+    }
+    if (value.includes("↑")) {
+      const baseValue = Number(value.replace(/[↓↑]/, '').trim());
+      if (!isNaN(baseValue)) {
+        return (<span className="flex flex-row items-center">{baseValue} <ArrowUp className="h-4 sm:h-6 lg:h-7" /></span>);
+      }
+    }
+    else return (<>{value}</>);
+  }
+
+const display = numericStat(text)
+
+
+  useEffect(() => {
+    console.log("Changes on ",text)
+    // Only animate if this is not the first render
+    if (prevText.current !== null && text !== prevText.current) {
+      setAnimate(true);
+      const timeout = setTimeout(() => setAnimate(false), 600);
+      return () => clearTimeout(timeout);
+    }
+
+    // Update the stored previous text value after render
+    prevText.current = text;
+  }, [text]);
+
+  return (
+    <>
+      <Tooltip>
+        <TooltipTrigger className="flex items-center justify-center rounded-md sm:gap-2">
           <Icon className="h-4 sm:h-6 lg:h-7" />
-          <span className={`text-xs lg:text-md line-clamp-1 lg:line-clamp-2 truncate 
-            hover:whitespace-normal hover:overflow-visible 
-            active:whitespace-normal active:overflow-visible ${text !== baseStat ? "" : "text-muted-foreground"}`}>{text}</span>
+          <span
+            className={`text-xs lg:text-md line-clamp-1 lg:line-clamp-2 truncate 
+              hover:whitespace-normal hover:overflow-visible 
+              active:whitespace-normal active:overflow-visible 
+              ${animate ? "fade-in" : ""}`}
+          >
+            {display}
+          </span>
         </TooltipTrigger>
         <TooltipContent>
           <span>{toolTipText}</span>
         </TooltipContent>
       </Tooltip>
+
+      <style jsx>{`
+        @keyframes fadeIn {
+          0% {
+            opacity: 0;
+            transform: translateY(4px);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .fade-in {
+          display: inline-block;
+          animation: fadeIn 600ms ease-out both;
+        }
+      `}</style>
+    </>
+
     );
   };
+
 
 
 
@@ -85,7 +146,7 @@ export default function StatMainDisplay({
     if (available !== 0) return (
       <div>
         <span className="flex flex-col justify-center ">
-          <span> {t("hintAvailable")} {available}</span>
+          <span> {t("hintAvailable")} {available} {tTools("attempts")} </span>
         </span>
       </div>);
 
@@ -179,11 +240,11 @@ export default function StatMainDisplay({
         {t("artist")} <span className={stat.artist === baseStat ? "" : animationReveal}>{stat.artist}</span>
       </div>
       <div className="w-full grid grid-cols-3 h-full lg:gap-3 sm:gap-2 gap-1 box-border">
-        <AlbumItem Icon={Medal} text={numericStat(stat.rank)} toolTipText={t("tooltips.rank")} />
-        <AlbumItem Icon={Calendar} text={numericStat(stat.date)} toolTipText={t("tooltips.year")} />
-        <AlbumItem Icon={MicVocal} text={stat.type} toolTipText={t("tooltips.albumType")} />
+        <AlbumItem Icon={Medal} text={stat.rank} toolTipText={t("tooltips.rank")}  />
+        <AlbumItem Icon={Calendar} text={stat.date} toolTipText={t("tooltips.year")}/>
+        <AlbumItem Icon={MicVocal} text={stat.type} toolTipText={t("tooltips.albumType")}/>
         <AlbumItem Icon={Users} text={stat.memberCount} toolTipText={t("tooltips.memberCount")} />
-        <AlbumItem Icon={MapPinned} text={stat.location} toolTipText={t("tooltips.location")} />
+        <AlbumItem Icon={MapPinned} text={stat.location} toolTipText={t("tooltips.location")}/>
         <AlbumItem Icon={Disc} text={stat.label} toolTipText={t("tooltips.label")} />
 
       </div>

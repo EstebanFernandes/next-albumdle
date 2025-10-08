@@ -9,20 +9,22 @@ export default async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const locale = request.cookies.get("NEXT_LOCALE")?.value ?? "en"
   // Protect only /admin routes
-  if (pathname.includes("/admin")) {
-    console.log("Admin route detected")
+  if (pathname.includes("/login")) {
     const cookie = request.cookies.get("admin-auth")?.value;
     const isAdmin = cookie ? await decodeAdminCookie(cookie) : false;
-    console.log("Is admin ",isAdmin)
-    // Case: admin is logged in and tries to access /admin/login → redirect to /admin
-    if (isAdmin && pathname.endsWith("/admin/login")) {
+    if (isAdmin) {
       return NextResponse.redirect(new URL(`/${locale}/admin`, request.url));
     }
-
+  }
+  else if (pathname.includes("/admin")) {
+    const cookie = request.cookies.get("admin-auth")?.value;
+    const isAdmin = cookie ? await decodeAdminCookie(cookie) : false;
+    console.log("Is admin =", isAdmin)
     // Case: not logged in and tries to access /admin (but not /admin/login) → redirect to login
-    if (!isAdmin && !pathname.endsWith("/admin/login")) {
-      return NextResponse.redirect(new URL(`/${locale}/admin/login`, request.url));
+    if (!isAdmin) {
+      return NextResponse.redirect(new URL(`/${locale}/login`, request.url));
     }
+
   }
 
   // Default: run intl middleware for locale handling

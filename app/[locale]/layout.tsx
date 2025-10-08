@@ -1,7 +1,7 @@
 import { Background } from "@/src/components/background";
 import { Header } from "@/src/components/header";
 import { Locale, routing } from "@/src/i18n/routing";
-import { getAlbums } from "@/src/lib/csv";
+import { getAlbums, getBackgroundAlbums } from "@/src/lib/gamemode";
 import type { Metadata } from "next";
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from "next-intl/server";
@@ -9,6 +9,7 @@ import { ThemeProvider } from "next-themes";
 import { Josefin_Sans } from "next/font/google";
 import { notFound } from "next/navigation";
 import "./globals.css";
+import { Footer } from "@/src/components/footer";
 /*
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,27 +38,35 @@ export default async function LocaleLayout({
   params
 }: {
   children: React.ReactNode;
-  params:  Promise<{ locale: string }>;
-}){
-const { locale } = await params;
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
 
-if(!routing.locales.includes(locale as Locale)){
+  if (!routing.locales.includes(locale as Locale)) {
     notFound()
   }
   const messages = await getMessages();
   return (
     <html lang={locale} suppressHydrationWarning>
-      <body 
-        className={`${josefin_Sans.className} antialiased flex flex-col justify-center items-center w-full h-full`}
+      <body
+        className={`${josefin_Sans.className} antialiased flex flex-col min-h-screen w-full`}
       >
-       <NextIntlClientProvider locale={locale} messages={messages}>
+        <NextIntlClientProvider locale={locale} messages={messages}>
           <ThemeProvider attribute="class" enableSystem defaultTheme="system">
-          <Header />
-          <Background albums={getAlbums(40)} />
-          {children}
+            <Header />
+            <Background albums={await getBackgroundAlbums(40)} />
+
+            {/* Main content grows to push footer down */}
+            <main className="flex-grow flex flex-col items-center w-full">
+              {children}
+            </main>
+
+            {/* Footer always at bottom */}
+            <Footer />
           </ThemeProvider>
         </NextIntlClientProvider>
       </body>
     </html>
+
   );
 }

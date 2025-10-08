@@ -1,8 +1,8 @@
 "use client";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
-import { startGame, submitGuess } from "../lib/logic";
-import { Album } from "../types/albums";
+import { startGame, submitGuess } from "../lib/logic-new";
+import { Album, GameMode } from "../types/albums";
 import { GameClientFirstInformation, GameClientLastUpdate, GameClientUpdate, GameState } from "../types/game-state";
 import { createDefaultMainStat, createDefaultStat, Stat } from "../types/stat";
 import { AlbumDisplay } from "./album-display";
@@ -18,7 +18,7 @@ import { Button } from "./ui/button";
 
 
 //Main component  of the main page
-export function MainComponent({ albums }: { albums: Album[] }) {
+export function MainComponent({ albums,gamemode }: { albums: Album[],gamemode:GameMode }) {
   const [selected, setSelected] = useState<number>(0);
   const [displayInfo, setDisplayInfo] = useState<Stat>(createDefaultMainStat());
   const [attemptsSquare, setAttemptsSquare] = useState<string[]>([]);
@@ -38,6 +38,7 @@ export function MainComponent({ albums }: { albums: Album[] }) {
   const confettiRef = useRef<ConfettiHandle>(null);
 
   const t = useTranslations("gamePage");
+    const tTools = useTranslations("tools");
   const [title, setTitle] = useState<string>(t("title"))
   const [subtitle, setSubtitle] = useState<string>(t("subtitle"))
 
@@ -47,7 +48,7 @@ export function MainComponent({ albums }: { albums: Album[] }) {
       labelImportant: album.title,
       labelSecondary: album.artist,
     })));
-    const startInformation = await startGame();
+    const startInformation = await startGame(gamemode.id);
     // Save server info
     storeSecure(startInformation.secure);
     console.log(startInformation.secure.data);
@@ -94,7 +95,7 @@ export function MainComponent({ albums }: { albums: Album[] }) {
         else
           attemptsSquare[newGameState.attempts.length as number - 1] = incorrect;
         setTitle(gameUpdate.hasWin ? t("gameOver.win.title") : t("gameOver.lose.title"))
-        setSubtitle(gameUpdate.hasWin ? t("gameOver.win.message") : t("gameOver.lose.message"));
+        setSubtitle(gameUpdate.hasWin ? `${t("gameOver.win.message")} ${newGameState.attempts.length} ${tTools("attempts")}`  : t("gameOver.lose.message"));
         setDisableInput(true)
         setClientLastUpdate(gameUpdate);
         break;
@@ -126,7 +127,7 @@ export function MainComponent({ albums }: { albums: Album[] }) {
 
   function handleEnter(value: string) {
     setSelected(parseInt(value));
-    const update = submitGuess(parseInt(value), { data: localStorage.getItem("data") as string, signature: localStorage.getItem("signature") as string });
+    const update = submitGuess(parseInt(value), { data: localStorage.getItem("data") as string, signature: localStorage.getItem("signature") as string },gamemode.id);
     update.then((response) => {
       updateGame(response);
     });
@@ -139,7 +140,7 @@ export function MainComponent({ albums }: { albums: Album[] }) {
     const album = clientLastUpdate.answer;
     const perc = Math.round(clientLastUpdate.guess / clientLastUpdate.try * 100);
     album.color = createDefaultStat()
-    const songs = clientLastUpdate.answer.top_songs;
+    const songs = clientLastUpdate.answer.topSongs;
     return (
       <Card className="w-full">
         <CardHeader><span className={`sm:text-2xl text-2xl `}>{t("gameOver.subtitle")}</span></CardHeader>

@@ -32,7 +32,7 @@ export function AlbumDisplay({ album }: { album: Album }) {
 			h-[50px] sm:h-[80px] md:h-[100px] lg:h-[128px] gap-2
 			transition-opacity duration-700 ${mounted ? "opacity-100" : "opacity-0"}`}>
 
-			<Image src={album.large_thumbnail} alt={album.title} width={128} height={128}
+			<Image src={album.largeThumbnail} alt={album.title} width={128} height={128}
 				className="size-[50px] sm:size-[80px] md:size-[100px] lg:size-[128px] rounded-md  aspect-square" 
 				onClick={() => setOpen(true)}/>
 			{open &&
@@ -41,7 +41,7 @@ export function AlbumDisplay({ album }: { album: Album }) {
 						className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
 						onClick={() => setOpen(false)}
 					>
-						<Image src={album.large_thumbnail} alt={album.title} width={300} height={300}
+						<Image src={album.largeThumbnail} alt={album.title} width={300} height={300}
 							className=" rounded-md  aspect-square"
 							onClick={(e) => e.stopPropagation()} // prevent closing on image click 
 						/>

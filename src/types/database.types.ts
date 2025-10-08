@@ -39,27 +39,83 @@ export type Database = {
   }
   public: {
     Tables: {
-      rolling_stones_magazine: {
+      game_data: {
         Row: {
           album_id: number | null
-          date: number | null
+          date: number
+          game_id: number | null
           guess: number | null
           id: number
           try: number | null
         }
         Insert: {
           album_id?: number | null
-          date?: number | null
+          date: number
+          game_id?: number | null
           guess?: number | null
           id?: number
           try?: number | null
         }
         Update: {
           album_id?: number | null
-          date?: number | null
+          date?: number
+          game_id?: number | null
           guess?: number | null
           id?: number
           try?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rolling_stones_magazine_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "gamemode"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gamemode: {
+        Row: {
+          created_at: string
+          csvUrl: string | null
+          description: string | null
+          id: number
+          properties: string | null
+          title: string | null
+          url: string | null
+        }
+        Insert: {
+          created_at?: string
+          csvUrl?: string | null
+          description?: string | null
+          id?: number
+          properties?: string | null
+          title?: string | null
+          url?: string | null
+        }
+        Update: {
+          created_at?: string
+          csvUrl?: string | null
+          description?: string | null
+          id?: number
+          properties?: string | null
+          title?: string | null
+          url?: string | null
+        }
+        Relationships: []
+      }
+      rap_us_game_data: {
+        Row: {
+          created_at: string
+          id: number
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+        }
+        Update: {
+          created_at?: string
+          id?: number
         }
         Relationships: []
       }

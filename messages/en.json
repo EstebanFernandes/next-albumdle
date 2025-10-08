@@ -32,7 +32,7 @@
       "comeOver": "Next album in : ",
       "win": {
         "title": "Congratulations!",
-        "message": "You guessed the album!"
+        "message": "You guessed today's album in"
       },
       "lose": {
         "title": "Loser!",
@@ -70,5 +70,8 @@
     },
     "attempts": "attempts",
     "available": "Available in"
+  },
+  "footer": {
+    "title": "Application created by"
   }
 }

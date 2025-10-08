@@ -34,7 +34,7 @@ export function CarouselWrapper({ albums, carouselDirection,className="" }: Caro
 	<CarouselContent >
 		{albums.map((album) => (
 			<CarouselItem key={album.id} className="relative group  py-10 sm:py-5 md:py-4 lg:py-3" >
-				<Image src={album.small_thumbnail} alt={album.title} width={100} height={100}
+				<Image src={album.smallThumbnail} alt={album.title} width={100} height={100}
 					className="rounded-sm sm:rounded-md w-full h-full object-cover aspect-square" />
 			</CarouselItem>
 		))}
