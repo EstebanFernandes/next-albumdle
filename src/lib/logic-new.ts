@@ -40,15 +40,16 @@ export async function submitGuess(
 
   // --- Validate the guess ---
   const gameData = await getGameDayData(state.gamemodeId)
-  if (gameData === null || gameData.today === null)
-    throw new Error("Game data does not exist for this");
+  if (gameData === null || gameData.today === null) { 
+    console.error(gameData)
+    throw new Error(`Game data does not exist for this id ${state.gamemodeId}`); }
 
   const albums = gameData.mode.data;
   const album = gameData.today.album;
   const guess = (guessId === -1) ? null : albums[guessId];
 
-  updateState(state, guess,gameData.today.album);
-  updateHints(state.hints,gameData.today);
+  updateState(state, guess, gameData.today.album);
+  updateHints(state.hints, gameData.today);
   const isCorrect = state.attempts.some(a => a.id === album.id);
   console.log(`Status of the guess : ${isCorrect.toString()}`)
   if (state.isGameOver || isCorrect) {
@@ -60,7 +61,7 @@ export async function submitGuess(
       hasWin: isCorrect,
       answer: album,
       secure: signState(state),
-      knownStat: calculateNewStat(state,gameData.today),
+      knownStat: calculateNewStat(state, gameData.today),
       isGameOver: true,
       dateToNextUpdate: new Date(Date.UTC(new Date().getUTCFullYear(), new Date().getUTCMonth(), new Date().getUTCDate() + 1)),
       try: gameData.today.try,
@@ -74,7 +75,7 @@ export async function submitGuess(
   const clientInfo: GameClientUpdate = {
     type: 'update',
     attemptVerify: guess,
-    knownStat: calculateNewStat(state,gameData.today),
+    knownStat: calculateNewStat(state, gameData.today),
     secure: signState(state),
     isGameOver: state.isGameOver
   };
@@ -82,9 +83,9 @@ export async function submitGuess(
   return clientInfo;
 }
 
-function updateState(state: GameState, guess: Album | null,todayAlbum:Album) {
+function updateState(state: GameState, guess: Album | null, todayAlbum: Album) {
   if (guess) {
-    updateColorOfAlbum(guess,todayAlbum);
+    updateColorOfAlbum(guess, todayAlbum);
     // Update the game state as needed
     state.attempts.unshift(guess);
   }
@@ -113,223 +114,223 @@ function updateHints(hints: hintState[], today: todayData) {
   }
 }
 
-  function numericLogic(values: number[], aimValue: number, isReverse = false) {
-    if (!Array.isArray(values) || values.length === 0) {
-      return baseStat;
+function numericLogic(values: number[], aimValue: number, isReverse = false) {
+  if (!Array.isArray(values) || values.length === 0) {
+    return baseStat;
+  }
+
+  aimValue = Number(aimValue);
+  if (isNaN(aimValue)) {
+    return baseStat;
+  }
+  if (values.includes(aimValue)) {
+
+    return String(aimValue)
+  }
+
+  if (values.length === 1) {
+    if (isReverse) {
+      const direction = values[0] < aimValue ? "↓" : "↑";
+      return `${values[0]} ${direction}`;
+    } else {
+      const direction = values[0] > aimValue ? "↓" : "↑";
+      return `${values[0]} ${direction}`;
     }
+  }
 
-    aimValue = Number(aimValue);
-    if (isNaN(aimValue)) {
-      return baseStat;
-    }
-    if (values.includes(aimValue)) {
+  let minRange = null;
 
-      return String(aimValue)
-    }
+  // Look for the smallest range that includes aimValue
+  for (let i = 0; i < values.length; i++) {
+    for (let j = i + 1; j < values.length; j++) {
+      const a = values[i];
+      const b = values[j];
+      const low = Math.min(a, b);
+      const high = Math.max(a, b);
 
-    if (values.length === 1) {
-      if (isReverse) {
-        const direction = values[0] < aimValue ? "↓" : "↑";
-        return `${values[0]} ${direction}`;
-      } else {
-        const direction = values[0] > aimValue ? "↓" : "↑";
-        return `${values[0]} ${direction}`;
-      }
-    }
-
-    let minRange = null;
-
-    // Look for the smallest range that includes aimValue
-    for (let i = 0; i < values.length; i++) {
-      for (let j = i + 1; j < values.length; j++) {
-        const a = values[i];
-        const b = values[j];
-        const low = Math.min(a, b);
-        const high = Math.max(a, b);
-
-        if (aimValue >= low && aimValue <= high) {
-          const size = high - low;
-          if (!minRange || size < minRange.size) {
-            minRange = { low, high, size };
-          }
+      if (aimValue >= low && aimValue <= high) {
+        const size = high - low;
+        if (!minRange || size < minRange.size) {
+          minRange = { low, high, size };
         }
       }
     }
-
-    if (minRange) {
-      return `${minRange.low} - ${minRange.high}`;
-    }
-
-    // If no valid range found, return nearest value + arrow
-    let closest = values[0];
-    let minDiff = Math.abs(values[0] - aimValue);
-
-    for (const val of values) {
-      const diff = Math.abs(val - aimValue);
-      if (diff < minDiff) {
-        minDiff = diff;
-        closest = val;
-      }
-    }
-
-    //True = up, False = down
-    let direction = closest < aimValue ? "↑" : "↓";
-    if (isReverse)
-      direction = closest > aimValue ? "↑" : "↓";
-    return `${closest} ${direction}`;
   }
 
-  function genreLogic(genres: string[], aimGenres: string[]): string[] {
-    if (!Array.isArray(genres) || genres.length === 0 || !aimGenres) {
-      return ['?'];
-    }
-
-    const genresSet = new Set(genres.map(g => g.toLowerCase()));
-    const returns: string[] = []
-    for (let i = 0; i < aimGenres.length; i++) {
-      const g = aimGenres[i];
-      if (genresSet.has(g.toLowerCase())) {
-        returns.push(g);
-      }
-      else
-        returns.push("?");
-    }
-
-    return returns;
+  if (minRange) {
+    return `${minRange.low} - ${minRange.high}`;
   }
 
+  // If no valid range found, return nearest value + arrow
+  let closest = values[0];
+  let minDiff = Math.abs(values[0] - aimValue);
 
-
-  function memberLogic(members: number[], aimMember: number): string {
-    if (!Array.isArray(members) || members.length === 0 || !aimMember) {
-      return '?';
+  for (const val of values) {
+    const diff = Math.abs(val - aimValue);
+    if (diff < minDiff) {
+      minDiff = diff;
+      closest = val;
     }
+  }
 
-    const found = members.find(member => member === aimMember);
-    if (!found)
-      return '?';
+  //True = up, False = down
+  let direction = closest < aimValue ? "↑" : "↓";
+  if (isReverse)
+    direction = closest > aimValue ? "↑" : "↓";
+  return `${closest} ${direction}`;
+}
 
-    if (Number(aimMember) === 1)
-      return "Solo";
-    else if (Number(aimMember) === 2)
-      return "Duo";
+function genreLogic(genres: string[], aimGenres: string[]): string[] {
+  if (!Array.isArray(genres) || genres.length === 0 || !aimGenres) {
+    return ['?'];
+  }
+
+  const genresSet = new Set(genres.map(g => g.toLowerCase()));
+  const returns: string[] = []
+  for (let i = 0; i < aimGenres.length; i++) {
+    const g = aimGenres[i];
+    if (genresSet.has(g.toLowerCase())) {
+      returns.push(g);
+    }
     else
-      return `Group (${aimMember})`;
+      returns.push("?");
   }
 
-  function capitalize(stringToCapitalize: string) {
-    return stringToCapitalize.charAt(0).toUpperCase() + stringToCapitalize.slice(1);
+  return returns;
+}
+
+
+
+function memberLogic(members: number[], aimMember: number): string {
+  if (!Array.isArray(members) || members.length === 0 || !aimMember) {
+    return '?';
   }
 
+  const found = members.find(member => member === aimMember);
+  if (!found)
+    return '?';
 
-  function signState(state: GameState) {
-    const data = JSON.stringify(state);
-    const signature = crypto
-      .createHmac('sha256', GAME_SECRET)
-      .update(data)
-      .digest('hex');
+  if (Number(aimMember) === 1)
+    return "Solo";
+  else if (Number(aimMember) === 2)
+    return "Duo";
+  else
+    return `Group (${aimMember})`;
+}
 
-    return { data, signature };
-  }
-
-  function verifyState(data: string, signature: string) {
-    const expected = crypto
-      .createHmac('sha256', GAME_SECRET)
-      .update(data)
-      .digest('hex');
-
-    return expected === signature;
-  }
-
-  function calculateNewStat(state: GameState,today:todayData): Stat {
-    const returnStat = createDefaultMainStat()
-    const attempts = state.attempts.filter(attempt => attempt.id !== -1)
-    const album = today.album;
-    //ARTIST NAME LOGIC
-    const artists = [...new Set(attempts.map(a => a.artist).filter(Boolean))];
-    returnStat.artist = (artists.includes(album?.artist)) ? album?.artist : "???";
-
-    // RANK LOGIC
-    const ranks = attempts.map(a => Number(a.rank)).filter(n => (!isNaN(n) || n !== -1));
-
-    returnStat.rank = numericLogic(ranks, album?.rank, true)
-
-    // RELEASE YEAR LOGIC
-    const releases = attempts.map(a => Number(a.releaseDate)).filter(n => !isNaN(n) || n !== -1);
-    console.log(releases)
-    returnStat.date = numericLogic(releases, album?.releaseDate);
-
-    const genres = Array.from(
-      new Set(
-        attempts
-          .map(a => a.genres)        // get the array of genres for each attempt
-          .filter(Boolean)           // remove undefined or null
-          .flat()                    // flatten array of arrays into a single array
-          .map(g => g.trim())        // trim whitespace
-          .filter(g => g.length > 0) // remove empty strings
-      )
-    );
+function capitalize(stringToCapitalize: string) {
+  return stringToCapitalize.charAt(0).toUpperCase() + stringToCapitalize.slice(1);
+}
 
 
-    returnStat.genres = genreLogic(genres, album?.genres);
+function signState(state: GameState) {
+  const data = JSON.stringify(state);
+  const signature = crypto
+    .createHmac('sha256', GAME_SECRET)
+    .update(data)
+    .digest('hex');
+
+  return { data, signature };
+}
+
+function verifyState(data: string, signature: string) {
+  const expected = crypto
+    .createHmac('sha256', GAME_SECRET)
+    .update(data)
+    .digest('hex');
+
+  return expected === signature;
+}
+
+function calculateNewStat(state: GameState, today: todayData): Stat {
+  const returnStat = createDefaultMainStat()
+  const attempts = state.attempts.filter(attempt => attempt.id !== -1)
+  const album = today.album;
+  //ARTIST NAME LOGIC
+  const artists = [...new Set(attempts.map(a => a.artist).filter(Boolean))];
+  returnStat.artist = (artists.includes(album?.artist)) ? album?.artist : "???";
+
+  // RANK LOGIC
+  const ranks = attempts.map(a => Number(a.rank)).filter(n => (!isNaN(n) || n !== -1));
+
+  returnStat.rank = numericLogic(ranks, album?.rank, true)
+
+  // RELEASE YEAR LOGIC
+  const releases = attempts.map(a => Number(a.releaseDate)).filter(n => !isNaN(n) || n !== -1);
+  console.log(releases)
+  returnStat.date = numericLogic(releases, album?.releaseDate);
+
+  const genres = Array.from(
+    new Set(
+      attempts
+        .map(a => a.genres)        // get the array of genres for each attempt
+        .filter(Boolean)           // remove undefined or null
+        .flat()                    // flatten array of arrays into a single array
+        .map(g => g.trim())        // trim whitespace
+        .filter(g => g.length > 0) // remove empty strings
+    )
+  );
 
 
-    // TYPE LOGIC
-    const types = attempts.map(a => a.type).filter(Boolean);
-    returnStat.type = types.includes(album?.type) ? album?.type : "???";
-
-    // MEMBERS LOGIC
-    const members = attempts.map(a => a.memberCount).filter(Boolean);
-    returnStat.memberCount = memberLogic(members, album?.memberCount);
-
-    // LOCATION LOGIC
-    const locations = attempts.map(a => a.country).filter(Boolean);
-    returnStat.location = (locations.includes(album?.country)) ? album?.country : "???";
+  returnStat.genres = genreLogic(genres, album?.genres);
 
 
-    // LABEL LOGIC
-    const labels = attempts.map(a => a.label).filter(Boolean);
-    returnStat.label = labels.includes(album?.label) ? album?.label : "???";
-    return returnStat;
-  }
+  // TYPE LOGIC
+  const types = attempts.map(a => a.type).filter(Boolean);
+  returnStat.type = types.includes(album?.type) ? album?.type : "???";
+
+  // MEMBERS LOGIC
+  const members = attempts.map(a => a.memberCount).filter(Boolean);
+  returnStat.memberCount = memberLogic(members, album?.memberCount);
+
+  // LOCATION LOGIC
+  const locations = attempts.map(a => a.country).filter(Boolean);
+  returnStat.location = (locations.includes(album?.country)) ? album?.country : "???";
 
 
-  function updateColorOfAlbum(albumToTry: Album,todayAlbum:Album) {
-
-    albumToTry.color.artist = (albumToTry.artist === todayAlbum.artist) ? correct : incorrect;
-
-    albumToTry.color.rank = (albumToTry.rank === todayAlbum.rank) ? correct : incorrect;
-
-    albumToTry.color.date = (albumToTry.releaseDate === todayAlbum.releaseDate) ? correct : incorrect;
-
-    //Here we gonna compare each genre
+  // LABEL LOGIC
+  const labels = attempts.map(a => a.label).filter(Boolean);
+  returnStat.label = labels.includes(album?.label) ? album?.label : "???";
+  return returnStat;
+}
 
 
-    const found = 0;
-    const albumGenres = todayAlbum.genres || [];
-    albumToTry.color.genres = []
-    for (const genre of albumToTry.genres) {
-      if (albumGenres.includes(genre))
-        albumToTry.color.genres.push(correct);
-      else
-        albumToTry.color.genres.push(incorrect);
-    }
+function updateColorOfAlbum(albumToTry: Album, todayAlbum: Album) {
+
+  albumToTry.color.artist = (albumToTry.artist === todayAlbum.artist) ? correct : incorrect;
+
+  albumToTry.color.rank = (albumToTry.rank === todayAlbum.rank) ? correct : incorrect;
+
+  albumToTry.color.date = (albumToTry.releaseDate === todayAlbum.releaseDate) ? correct : incorrect;
+
+  //Here we gonna compare each genre
 
 
-    albumToTry.color.type = (albumToTry.type === todayAlbum.type) ? correct : incorrect;
-
-    const tryCount = albumToTry.memberCount; const albumCount = todayAlbum.memberCount || 0;
-    if (tryCount === albumCount)
-      albumToTry.color.memberCount = correct;
-    else if (Math.abs(tryCount - albumCount) === 1) //Little difference
-      albumToTry.color.memberCount = partial;
+  const found = 0;
+  const albumGenres = todayAlbum.genres || [];
+  albumToTry.color.genres = []
+  for (const genre of albumToTry.genres) {
+    if (albumGenres.includes(genre))
+      albumToTry.color.genres.push(correct);
     else
-      albumToTry.color.memberCount = incorrect;
-
-    albumToTry.color.location = (albumToTry.country === todayAlbum.country) ? correct : incorrect;
-
-    albumToTry.color.label = (albumToTry.label === todayAlbum.label) ? correct : incorrect;
-
+      albumToTry.color.genres.push(incorrect);
   }
+
+
+  albumToTry.color.type = (albumToTry.type === todayAlbum.type) ? correct : incorrect;
+
+  const tryCount = albumToTry.memberCount; const albumCount = todayAlbum.memberCount || 0;
+  if (tryCount === albumCount)
+    albumToTry.color.memberCount = correct;
+  else if (Math.abs(tryCount - albumCount) === 1) //Little difference
+    albumToTry.color.memberCount = partial;
+  else
+    albumToTry.color.memberCount = incorrect;
+
+  albumToTry.color.location = (albumToTry.country === todayAlbum.country) ? correct : incorrect;
+
+  albumToTry.color.label = (albumToTry.label === todayAlbum.label) ? correct : incorrect;
+
+}
 
 

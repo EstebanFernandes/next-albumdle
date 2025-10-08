@@ -10,6 +10,7 @@ import { Josefin_Sans } from "next/font/google";
 import { notFound } from "next/navigation";
 import "./globals.css";
 import { Footer } from "@/src/components/footer";
+import { Toaster } from "@/src/components/ui/sonner";
 /*
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -60,7 +61,7 @@ export default async function LocaleLayout({
             <main className="flex-grow flex flex-col items-center w-full">
               {children}
             </main>
-
+             <Toaster />
             {/* Footer always at bottom */}
             <Footer />
           </ThemeProvider>

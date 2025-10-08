@@ -12,6 +12,7 @@ import { Separator } from "./ui/separator";
 import { Card, CardContent, CardHeader } from "./ui/card";
 import Confetti, { ConfettiHandle } from "./confetti";
 import { Button } from "./ui/button";
+import { toast } from "sonner"
 
 
 
@@ -130,6 +131,8 @@ export function MainComponent({ albums,gamemode }: { albums: Album[],gamemode:Ga
     const update = submitGuess(parseInt(value), { data: localStorage.getItem("data") as string, signature: localStorage.getItem("signature") as string },gamemode.id);
     update.then((response) => {
       updateGame(response);
+    }).catch((error)=>{
+      toast(`Server error : ${error}`)
     });
   }
 
