@@ -8,3 +8,9 @@ export function memberCountToString(count: number): string {
     return `${count} Members`;
   }
 }
+export function  capitalize(value:string|undefined)
+{
+  if(value)
+  return value.at(0)?.toLocaleUpperCase().concat(value.substring(1))
+return undefined;
+}

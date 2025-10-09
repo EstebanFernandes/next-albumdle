@@ -13,9 +13,7 @@ export default async function GamePage({ searchParams }: GamePageProps) {
   const gamemode = await getGamemode(gID)
   if (gamemode) {
     return (
-      <div>
         <MainComponent albums={albums} gamemode={gamemode} />
-      </div>
     );
 
   } return (

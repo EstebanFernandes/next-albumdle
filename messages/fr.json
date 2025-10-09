@@ -73,5 +73,16 @@
   },
   "footer": {
     "title": "Application créee par"
+  },
+  "gamedata": {
+    "rolling_stones": "L'album du jour est déterminé aléatoirement d'après le classement des 500 meilleurs albums de tous les temps par le magazine Rolling Stones"
+  },
+  "sidebar": {
+    "navigation": {
+      "admin": "Page admin",
+      "about": "A propos",
+      "title": "Navigation"
+    },
+    "settings": "Réglages"
   }
 }

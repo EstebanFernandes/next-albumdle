@@ -7,6 +7,7 @@ import { Button } from "./ui/button"
 import { useTranslations } from "next-intl"
 import { StepForward } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip"
+import { ButtonGroup } from "./ui/button-group"
 
 export default function AutoComplete({
   fullList,
@@ -119,7 +120,7 @@ export default function AutoComplete({
             </Card>
           )}
         </div>
-        <div className=" flex flex-row gap-1">
+        <ButtonGroup>
           <Button onClick={enterPressed} disabled={disabled}>{t("button")}</Button>
           <TooltipProvider>
             <Tooltip>
@@ -132,7 +133,7 @@ export default function AutoComplete({
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-        </div>
+        </ButtonGroup>
       </div>
     </div>
   )

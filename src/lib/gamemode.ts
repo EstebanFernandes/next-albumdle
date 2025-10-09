@@ -7,6 +7,7 @@ import { getAlbum, getAlbumsRawData } from "./csv";
 import { getRandomElements, todayDateString } from "./utils";
 
 const gamemodes: GameDayData[] = [];
+const backgroundAlbums:BackgroundAlbum[] = []
  export async function initGamemodes()
 {
   console.log("initializing Game data")
@@ -101,19 +102,19 @@ export async function getAlbums(gID:number,numberOfAlbums:number=-1)
 export async function getBackgroundAlbums(albumCount:number=40): Promise<BackgroundAlbum[]>
 {
   const data = await getAlbums(1,albumCount)
-  const result:BackgroundAlbum[] =[]
-  if(data===null)
-    return result;
+  
+  if(data===null || backgroundAlbums.length===albumCount)
+    return backgroundAlbums;
   for(const album of data)
   {
-    result.push({
+    backgroundAlbums.push({
       id: album.id, 
       title: album["title"],
       thumbnail: album["smallThumbnail"],
       scale: Math.floor(Math.random() * (100 - 90 + 1) + 90)
     })
   }
-  return result;
+  return backgroundAlbums;
 }
 
 export async function getProperties(gID:number)
@@ -132,4 +133,12 @@ export async function updateAlbums()
   {
     updateDayData(gameday)
   }
+}
+
+export async function getAllGamemodes()
+{
+  console.log("returning every gamemode")
+  if(gamemodes.length===0)
+    await initGamemodes()
+  return gamemodes;
 }

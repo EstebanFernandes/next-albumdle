@@ -13,13 +13,15 @@ import { Card, CardContent, CardHeader } from "./ui/card";
 import Confetti, { ConfettiHandle } from "./confetti";
 import { Button } from "./ui/button";
 import { toast } from "sonner"
+import { CircleQuestionMark } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 
 
 
 
 //Main component  of the main page
-export function MainComponent({ albums,gamemode }: { albums: Album[],gamemode:GameMode }) {
+export function MainComponent({ albums, gamemode }: { albums: Album[], gamemode: GameMode }) {
   const [selected, setSelected] = useState<number>(0);
   const [displayInfo, setDisplayInfo] = useState<Stat>(createDefaultMainStat());
   const [attemptsSquare, setAttemptsSquare] = useState<string[]>([]);
@@ -39,7 +41,8 @@ export function MainComponent({ albums,gamemode }: { albums: Album[],gamemode:Ga
   const confettiRef = useRef<ConfettiHandle>(null);
 
   const t = useTranslations("gamePage");
-    const tTools = useTranslations("tools");
+  const tTools = useTranslations("tools");
+  const tRoot = useTranslations("")
   const [title, setTitle] = useState<string>(t("title"))
   const [subtitle, setSubtitle] = useState<string>(t("subtitle"))
 
@@ -96,7 +99,7 @@ export function MainComponent({ albums,gamemode }: { albums: Album[],gamemode:Ga
         else
           attemptsSquare[newGameState.attempts.length as number - 1] = incorrect;
         setTitle(gameUpdate.hasWin ? t("gameOver.win.title") : t("gameOver.lose.title"))
-        setSubtitle(gameUpdate.hasWin ? `${t("gameOver.win.message")} ${newGameState.attempts.length} ${tTools("attempts")}`  : t("gameOver.lose.message"));
+        setSubtitle(gameUpdate.hasWin ? `${t("gameOver.win.message")} ${newGameState.attempts.length} ${tTools("attempts")}` : t("gameOver.lose.message"));
         setDisableInput(true)
         setClientLastUpdate(gameUpdate);
         break;
@@ -128,10 +131,10 @@ export function MainComponent({ albums,gamemode }: { albums: Album[],gamemode:Ga
 
   function handleEnter(value: string) {
     setSelected(parseInt(value));
-    const update = submitGuess(parseInt(value), { data: localStorage.getItem("data") as string, signature: localStorage.getItem("signature") as string },gamemode.id);
+    const update = submitGuess(parseInt(value), { data: localStorage.getItem("data") as string, signature: localStorage.getItem("signature") as string }, gamemode.id);
     update.then((response) => {
       updateGame(response);
-    }).catch((error)=>{
+    }).catch((error) => {
       toast(`Server error : ${error}`)
     });
   }
@@ -152,7 +155,7 @@ export function MainComponent({ albums,gamemode }: { albums: Album[],gamemode:Ga
             <div className="flex flex-row items-start">
               <AlbumDisplay album={album} />
               <div className="w-3/10 flex flex-col items-start">
-                  <span className="font-weight text-lg"> {t("currentInformation.songs")} </span>
+                <span className="font-weight text-lg"> {t("currentInformation.songs")} </span>
                 <ul>
                   {songs.map((song) =>
                     (<li key={song} className="font-weight text-sm">{song}</li>))}
@@ -223,11 +226,16 @@ export function MainComponent({ albums,gamemode }: { albums: Album[],gamemode:Ga
 
 
   return (
-    <div className=" w-[100vw] lg:w-[50vw] md:w-[50vw] sm:w-[70vw] h-full text-xs sm:text-sm md:text-lg
-    px-2">
+    <div className=" w-full  text-xs sm:text-sm md:text-lg
+    px-2 ">
       <div className="flex flex-col justify-center items-center gap-2 mt-5">
         <div className=" text-xl sm:text-2xl md:text-3xl">{title} </div>
-        <div className="text-md sm:text-lg md:text-xl">{subtitle}</div>
+        <span className="text-md sm:text-lg md:text-xl">{subtitle}
+          <Tooltip>
+            <TooltipTrigger><CircleQuestionMark /></TooltipTrigger>
+            <TooltipContent> {tRoot(`gamedata.${gamemode.title.replaceAll(" ","_").toLowerCase()}`)} </TooltipContent>
+          </Tooltip>
+          </span>
       </div>
       {clientLastUpdate === null && displayCurrentHeadInfo()}
       <div className="flex flex-col justify-center items-center gap-4 mt-6">
@@ -238,7 +246,7 @@ export function MainComponent({ albums,gamemode }: { albums: Album[],gamemode:Ga
           {clientLastUpdate && displayLastDialog(clientLastUpdate)}
           <p className="text-xl"> {t("attemptsList")}</p>
           <div className="flex flex-col-reverse gap-4 w-full mb-4">
-            <ul className="list-none divide-y divide-gray-300">
+            <ul className="list-none divide-y divide-gray-300 ">
               {gameState?.attempts.map((album, index) => (
                 <li
                   key={album.id === -1 ? `empty-${index}` : album.id}
@@ -253,7 +261,7 @@ export function MainComponent({ albums,gamemode }: { albums: Album[],gamemode:Ga
           </div>
         </div>
       </div>
-      <Confetti ref={confettiRef} count={50}  />
+      <Confetti ref={confettiRef} count={50} />
     </div>
   );
   function storeSecure(secure: { data: string, signature: string }) {
